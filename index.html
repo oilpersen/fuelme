@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kumpulkan Minyak</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+  margin:0;
+  font-family:'Segoe UI',sans-serif;
+  background:#f4f6fb;
+}
+
+.topbar {
+  background:linear-gradient(135deg,#005bea,#00c6fb);
+  color:white;
+  padding:20px;
+  border-radius:0 0 25px 25px;
+}
+
+.container {
+  max-width:420px;
+  margin:auto;
+  padding:15px;
+  margin-top:-30px;
+}
+
+/* CARD UTAMA */
+.main-card {
+  background:white;
+  padding:20px;
+  border-radius:20px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1);
+  margin-bottom:15px;
+  position:relative;
+}
+
+/* TARGET KECIL POJOK */
+.target-badge {
+  position:absolute;
+  top:15px;
+  right:15px;
+  background:#f1f3f6;
+  padding:6px 12px;
+  border-radius:20px;
+  font-size:12px;
+  color:#555;
+}
+
+/* TOTAL BESAR */
+.big {
+  font-size:32px;
+  font-weight:bold;
+  margin-top:10px;
+  color:#2c3e50;
+}
+
+/* PROGRESS */
+.progress {
+  height:8px;
+  background:#eee;
+  border-radius:10px;
+  overflow:hidden;
+  margin-top:10px;
+}
+
+.progress div {
+  height:100%;
+  background:linear-gradient(90deg,#f7971e,#ffd200);
+  width:0%;
+}
+
+/* CARD BIASA */
+.card {
+  background:white;
+  padding:15px;
+  border-radius:15px;
+  margin-bottom:15px;
+  box-shadow:0 5px 10px rgba(0,0,0,0.08);
+}
+
+input {
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #ddd;
+  margin-top:10px;
+}
+
+button {
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  margin-top:10px;
+  background:#005bea;
+  color:white;
+  font-weight:bold;
+}
+
+.logout-btn {
+  background:#e74c3c;
+}
+
+.hidden {display:none;}
+
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+  <h3>Halo</h3>
+  <h2 id="userDisplay">User</h2>
+</div>
+
+<div class="container">
+
+<!-- LOGIN -->
+<div id="auth" class="card">
+
+<h3>Login</h3>
+<input id="username" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+
+<hr>
+
+<h3>Register</h3>
+<input id="nama" placeholder="Nama">
+<input id="usernameReg" placeholder="Email">
+<input id="passwordReg" type="password" placeholder="Password">
+<button onclick="register()">Register</button>
+
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="hidden">
+
+  <!-- CARD UTAMA -->
+  <div class="main-card">
+    
+    <div class="target-badge">
+      🎯 <span id="targetDisplay">0</span> L
+    </div>
+
+    <div>Total Minyak</div>
+    <div class="big" id="totalMinyak">0 L</div>
+
+    <div id="progressText">0%</div>
+    <div class="progress">
+      <div id="progressBar"></div>
+    </div>
+
+  </div>
+
+  <!-- INPUT -->
+  <div class="card">
+    <div>Tambah Minyak</div>
+    <input id="inputMinyak" type="number" placeholder="Liter">
+    <button onclick="kirimMinyak()">Simpan</button>
+  </div>
+
+  <!-- CHART -->
+  <div class="card">
+    <div>Grafik Harga</div>
+    <canvas id="chart"></canvas>
+  </div>
+
+  <button class="logout-btn" onclick="logout()">Logout</button>
+
+</div>
+
+</div>
+
+<script>
+
+const API = "https://script.google.com/macros/s/AKfycbwNh0O6Abaj4lquaQhKCIY6ObY32HE77qNNPVRRl6dx_mSy6KNzP_xLgEhyfUIwTrx5/exec";
+let chartInstance;
+
+// LOGIN
+async function login(){
+  let res = await fetch(`${API}?action=login&username=${username.value}&password=${password.value}`);
+  let d = await res.json();
+
+  if(d.status=="success"){
+    localStorage.setItem("email", d.email);
+    localStorage.setItem("nama", d.nama);
+    localStorage.setItem("target", d.target);
+    showDashboard();
+  } else alert("Login gagal");
+}
+
+// REGISTER
+async function register(){
+  let res = await fetch(`${API}?action=register&username=${usernameReg.value}&password=${passwordReg.value}&nama=${nama.value}`);
+  let d = await res.json();
+
+  alert(d.status=="success" ? "Berhasil daftar" : "Gagal");
+}
+
+// DASHBOARD
+function showDashboard(){
+  auth.classList.add("hidden");
+  dashboard.classList.remove("hidden");
+
+  userDisplay.innerText = localStorage.getItem("nama");
+  targetDisplay.innerText = localStorage.getItem("target");
+
+  loadTotal();
+  loadChart();
+}
+
+// INPUT
+async function kirimMinyak(){
+  let user = localStorage.getItem("email");
+
+  if(!inputMinyak.value){
+    alert("Isi dulu");
+    return;
+  }
+
+  await fetch(`${API}?action=tambahMinyak&username=${user}&jumlah=${inputMinyak.value}`);
+
+  inputMinyak.value="";
+  loadTotal();
+}
+
+// TOTAL
+async function loadTotal(){
+  let user = localStorage.getItem("email");
+  let target = Number(localStorage.getItem("target"));
+
+  let res = await fetch(`${API}?action=totalMinyak&username=${user}`);
+  let d = await res.json();
+
+  let total = d.total;
+
+  totalMinyak.innerText = total+" L";
+
+  let persen = target>0 ? (total/target)*100 : 0;
+  if(persen>100) persen=100;
+
+  progressBar.style.width = persen+"%";
+  progressText.innerText = persen.toFixed(1)+"%";
+}
+
+// CHART
+async function loadChart(){
+  let res = await fetch(`${API}?action=harga`);
+  let d = await res.json();
+
+  if(chartInstance){
+    chartInstance.destroy();
+  }
+
+  chartInstance = new Chart(chart,{
+    type:"line",
+    data:{
+      labels:d.map(x=>x.tanggal),
+      datasets:[{
+        data:d.map(x=>x.harga),
+        tension:0.4,
+        fill:true
+      }]
+    }
+  });
+}
+
+// REALTIME
+setInterval(() => {
+  if(localStorage.getItem("email")){
+    loadTotal();
+  }
+}, 5000);
+
+setInterval(() => {
+  if(localStorage.getItem("email")){
+    loadChart();
+  }
+}, 10000);
+
+// LOGOUT
+function logout(){
+  localStorage.clear();
+  location.reload();
+}
+
+// AUTO LOGIN
+if(localStorage.getItem("email")){
+  showDashboard();
+}
+
+</script>
+
+</body>
+</html>
