@@ -144,6 +144,14 @@ body{
   color:#16a34a;
 }
 
+.chart-price span.neutral{
+  color:#6b7280;
+}
+
+.chart-price span.down{
+  color:#dc2626;
+}
+
 .chart-grid{
   position:relative;
   height:180px;
@@ -357,8 +365,8 @@ body{
         <p>Pembaruan terakhir: hari ini</p>
       </div>
       <div class="chart-price">
-        <strong>Rp 6.800</strong>
-        <span>Naik 4,6%</span>
+        <strong id="weekly-average-price">Rp 0</strong>
+        <span id="weekly-change-info" class="neutral">Menunggu data</span>
       </div>
     </div>
 
@@ -399,9 +407,15 @@ body{
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbzREUQOzJOCbiQtlZ0CwHx2dD7NbZODIGVbpqliFMSJBtpQ655i-s-0Ss3AYbDIbLEl/exec"; // ganti
 
+function formatRupiah(value) {
+  return `Rp ${Math.round(value).toLocaleString("id-ID")}`;
+}
+
 async function loadChart() {
   const priceChart = document.querySelector(".price-chart");
   const chartGrid = document.querySelector(".chart-grid");
+  const averagePrice = document.querySelector("#weekly-average-price");
+  const changeInfo = document.querySelector("#weekly-change-info");
 
   try {
     if (priceChart) {
@@ -430,6 +444,28 @@ async function loadChart() {
     const max = Math.max(...prices);
     const min = Math.min(...prices);
     const range = max - min || 1;
+    const average = prices.reduce((total, price) => total + price, 0) / prices.length;
+    const firstPrice = prices[0];
+    const lastPrice = prices[prices.length - 1];
+    const changePercent = firstPrice ? ((lastPrice - firstPrice) / firstPrice) * 100 : 0;
+
+    if (averagePrice) {
+      averagePrice.textContent = formatRupiah(average);
+    }
+
+    if (changeInfo) {
+      changeInfo.classList.remove("neutral", "down");
+
+      if (changePercent > 0) {
+        changeInfo.textContent = `Naik ${changePercent.toFixed(1).replace(".", ",")}% minggu ini`;
+      } else if (changePercent < 0) {
+        changeInfo.textContent = `Turun ${Math.abs(changePercent).toFixed(1).replace(".", ",")}% minggu ini`;
+        changeInfo.classList.add("down");
+      } else {
+        changeInfo.textContent = "Stabil minggu ini";
+        changeInfo.classList.add("neutral");
+      }
+    }
 
     data.forEach((item) => {
       const height = ((Number(item.harga) - min) / range) * 100;
