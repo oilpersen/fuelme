@@ -113,6 +113,7 @@ body{
   border-radius:18px;
   padding:18px 16px 14px;
   box-shadow:0 10px 30px rgba(12, 79, 48, 0.08);
+  position:relative;
 }
 
 .chart-header{
@@ -215,6 +216,47 @@ body{
   white-space:nowrap;
 }
 
+.chart-loading{
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  background:rgba(255, 255, 255, 0.9);
+  border-radius:18px;
+  opacity:0;
+  visibility:hidden;
+  transition:opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.price-chart.loading .chart-loading{
+  opacity:1;
+  visibility:visible;
+}
+
+.loading-spinner{
+  width:42px;
+  height:42px;
+  border:4px solid #dcfce7;
+  border-top-color:#16a34a;
+  border-radius:50%;
+  animation:spin 0.85s linear infinite;
+}
+
+.chart-loading p{
+  font-size:13px;
+  font-weight:600;
+  color:#166534;
+}
+
+@keyframes spin{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
 /* PENCAPAIAN */
 .pencapaian{
   margin:15px;
@@ -308,7 +350,7 @@ body{
 <!-- GRAFIK HARGA -->
 <div class="map-section">
   <h3>Grafik Harga per Liter</h3>
-  <div class="price-chart">
+  <div class="price-chart loading">
     <div class="chart-header">
       <div>
         <h4>Pergerakan Harga Mingguan</h4>
@@ -328,35 +370,10 @@ body{
         <span>6.4k</span>
         <span>6.2k</span>
       </div>
-
-      <div class="chart-bar">
-        <div class="bar-fill" data-price="6.200" style="height:40%;"></div>
-        <span>Sen</span>
-      </div>
-      <div class="chart-bar">
-        <div class="bar-fill" data-price="6.350" style="height:52%;"></div>
-        <span>Sel</span>
-      </div>
-      <div class="chart-bar">
-        <div class="bar-fill" data-price="6.500" style="height:64%;"></div>
-        <span>Rab</span>
-      </div>
-      <div class="chart-bar">
-        <div class="bar-fill" data-price="6.400" style="height:56%;"></div>
-        <span>Kam</span>
-      </div>
-      <div class="chart-bar">
-        <div class="bar-fill" data-price="6.650" style="height:76%;"></div>
-        <span>Jum</span>
-      </div>
-      <div class="chart-bar">
-        <div class="bar-fill" data-price="6.720" style="height:82%;"></div>
-        <span>Sab</span>
-      </div>
-      <div class="chart-bar">
-        <div class="bar-fill" data-price="6.800" style="height:88%;"></div>
-        <span>Min</span>
-      </div>
+    </div>
+    <div class="chart-loading">
+      <div class="loading-spinner"></div>
+      <p>Mengambil data harga...</p>
     </div>
   </div>
 </div>
@@ -378,6 +395,66 @@ body{
   <div class="nav-item">Dampak Hijau</div>
   <div class="nav-item">Profil</div>
 </div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbzREUQOzJOCbiQtlZ0CwHx2dD7NbZODIGVbpqliFMSJBtpQ655i-s-0Ss3AYbDIbLEl/exec"; // ganti
+
+async function loadChart() {
+  const priceChart = document.querySelector(".price-chart");
+  const chartGrid = document.querySelector(".chart-grid");
+
+  try {
+    if (priceChart) {
+      priceChart.classList.add("loading");
+    }
+
+    if (API_URL === "URL_WEB_APP_KAMU") {
+      return;
+    }
+
+    const res = await fetch(API_URL);
+    const data = await res.json();
+
+    if (!Array.isArray(data) || data.length === 0) {
+      return;
+    }
+
+    if (!chartGrid) {
+      return;
+    }
+
+    // Hapus bar lama tanpa mengganggu label sumbu Y.
+    chartGrid.querySelectorAll(".chart-bar").forEach((el) => el.remove());
+
+    const prices = data.map((d) => Number(d.harga));
+    const max = Math.max(...prices);
+    const min = Math.min(...prices);
+    const range = max - min || 1;
+
+    data.forEach((item) => {
+      const height = ((Number(item.harga) - min) / range) * 100;
+
+      const bar = document.createElement("div");
+      bar.className = "chart-bar";
+
+      bar.innerHTML = `
+        <div class="bar-fill" data-price="${item.harga}" style="height:${Math.max(height, 12)}%"></div>
+        <span>${item.hari}</span>
+      `;
+
+      chartGrid.appendChild(bar);
+    });
+  } catch (err) {
+    console.error("Gagal load grafik:", err);
+  } finally {
+    if (priceChart) {
+      priceChart.classList.remove("loading");
+    }
+  }
+}
+
+loadChart();
+</script>
 
 </body>
 </html>
