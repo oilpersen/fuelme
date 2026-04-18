@@ -3,298 +3,231 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kumpulkan Minyak</title>
+<title>Dashboard</title>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
-body {
+*{
   margin:0;
-  font-family:'Segoe UI',sans-serif;
-  background:#f4f6fb;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
 }
 
-.topbar {
-  background:linear-gradient(135deg,#005bea,#00c6fb);
-  color:white;
-  padding:20px;
-  border-radius:0 0 25px 25px;
+body{
+  background:#f2f4f7;
 }
 
-.container {
-  max-width:420px;
-  margin:auto;
+/* HEADER */
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
   padding:15px;
-  margin-top:-30px;
 }
 
-/* CARD UTAMA */
-.main-card {
-  background:white;
-  padding:20px;
-  border-radius:20px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.1);
-  margin-bottom:15px;
-  position:relative;
+.profile{
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
 
-/* TARGET KECIL POJOK */
-.target-badge {
-  position:absolute;
-  top:15px;
-  right:15px;
-  background:#f1f3f6;
-  padding:6px 12px;
-  border-radius:20px;
-  font-size:12px;
-  color:#555;
-}
-
-/* TOTAL BESAR */
-.big {
-  font-size:32px;
+.avatar{
+  width:45px;
+  height:45px;
+  background:#1b5e20;
+  color:#fff;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   font-weight:bold;
-  margin-top:10px;
-  color:#2c3e50;
 }
 
-/* PROGRESS */
-.progress {
-  height:8px;
-  background:#eee;
-  border-radius:10px;
-  overflow:hidden;
-  margin-top:10px;
+.header-text small{
+  color:#4caf50;
 }
 
-.progress div {
-  height:100%;
-  background:linear-gradient(90deg,#f7971e,#ffd200);
-  width:0%;
+.header-text h3{
+  font-size:16px;
 }
 
-/* CARD BIASA */
-.card {
-  background:white;
+/* CARD GREEN */
+.card{
+  margin:15px;
+  background:linear-gradient(135deg,#0aa66c,#0d8f5a);
+  border-radius:20px;
+  padding:15px;
+  color:#fff;
+}
+
+/* SALDO */
+.saldo-container{
+  display:flex;
+  gap:10px;
+}
+
+.saldo-box{
+  flex:1;
+  background:#fff;
+  color:#000;
+  border-radius:15px;
+  padding:10px;
+}
+
+.saldo-box h4{
+  font-size:14px;
+  margin-bottom:5px;
+}
+
+.saldo-box p{
+  font-weight:bold;
+}
+
+/* MENU */
+.menu{
+  margin-top:15px;
+  display:flex;
+  justify-content:space-between;
+}
+
+.menu-item{
+  width:22%;
+  background:#0a5f2f;
+  padding:10px;
+  border-radius:12px;
+  text-align:center;
+  color:#fff;
+  font-size:12px;
+}
+
+/* MAP */
+.map-section{
+  margin:15px;
+}
+
+.map{
+  width:100%;
+  height:200px;
+  border-radius:15px;
+  background:url('https://maps.gstatic.com/tactile/basepage/pegman_sherlock.png');
+  background-size:cover;
+}
+
+/* PENCAPAIAN */
+.pencapaian{
+  margin:15px;
+  background:#fff;
   padding:15px;
   border-radius:15px;
-  margin-bottom:15px;
-  box-shadow:0 5px 10px rgba(0,0,0,0.08);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
 }
 
-input {
-  width:100%;
-  padding:12px;
+.progress{
+  width:70%;
+}
+
+.progress-bar{
+  height:6px;
+  background:#ddd;
   border-radius:10px;
-  border:1px solid #ddd;
-  margin-top:10px;
+  margin-top:8px;
 }
 
-button {
-  width:100%;
-  padding:12px;
+.progress-fill{
+  width:40%;
+  height:100%;
+  background:#4caf50;
   border-radius:10px;
-  border:none;
-  margin-top:10px;
-  background:#005bea;
-  color:white;
-  font-weight:bold;
 }
 
-.logout-btn {
-  background:#e74c3c;
+/* NAVBAR */
+.navbar{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  background:#fff;
+  display:flex;
+  justify-content:space-around;
+  padding:10px 0;
+  border-top:1px solid #ddd;
 }
 
-.hidden {display:none;}
+.nav-item{
+  text-align:center;
+  font-size:12px;
+  color:#999;
+}
 
+.nav-item.active{
+  color:#1b5e20;
+}
 </style>
 </head>
 
 <body>
 
-<div class="topbar">
-  <h3>Halo</h3>
-  <h2 id="userDisplay">User</h2>
-</div>
-
-<div class="container">
-
-<!-- LOGIN -->
-<div id="auth" class="card">
-
-<h3>Login</h3>
-<input id="username" placeholder="Email">
-<input id="password" type="password" placeholder="Password">
-<button onclick="login()">Login</button>
-
-<hr>
-
-<h3>Register</h3>
-<input id="nama" placeholder="Nama">
-<input id="usernameReg" placeholder="Email">
-<input id="passwordReg" type="password" placeholder="Password">
-<button onclick="register()">Register</button>
-
-</div>
-
-<!-- DASHBOARD -->
-<div id="dashboard" class="hidden">
-
-  <!-- CARD UTAMA -->
-  <div class="main-card">
-    
-    <div class="target-badge">
-      🎯 <span id="targetDisplay">0</span> L
+<!-- HEADER -->
+<div class="header">
+  <div class="profile">
+    <div class="avatar">U</div>
+    <div class="header-text">
+      <small>Selamat datang kembali,</small>
+      <h3>User</h3>
     </div>
+  </div>
+  🔔
+</div>
 
-    <div>Total Minyak</div>
-    <div class="big" id="totalMinyak">0 L</div>
+<!-- CARD -->
+<div class="card">
 
-    <div id="progressText">0%</div>
-    <div class="progress">
-      <div id="progressBar"></div>
+  <div class="saldo-container">
+    <div class="saldo-box">
+      <h4>Saldo</h4>
+      <p>RP 0</p>
     </div>
-
+    <div class="saldo-box">
+      <h4>Reward/Liter</h4>
+      <p>RP 0</p>
+    </div>
   </div>
 
-  <!-- INPUT -->
-  <div class="card">
-    <div>Tambah Minyak</div>
-    <input id="inputMinyak" type="number" placeholder="Liter">
-    <button onclick="kirimMinyak()">Simpan</button>
+  <div class="menu">
+    <div class="menu-item">Capaian</div>
+    <div class="menu-item">Informasi</div>
+    <div class="menu-item">Tarik</div>
+    <div class="menu-item">Mutasi</div>
   </div>
-
-  <!-- CHART -->
-  <div class="card">
-    <div>Grafik Harga</div>
-    <canvas id="chart"></canvas>
-  </div>
-
-  <button class="logout-btn" onclick="logout()">Logout</button>
 
 </div>
 
+<!-- MAP -->
+<div class="map-section">
+  <h3>Informasi Harga Real-time</h3>
+  <div class="map"></div>
 </div>
 
-<script>
+<!-- PENCAPAIAN -->
+<div class="pencapaian">
+  <div class="progress">
+    <h4>25 Liter ke tingkat berikutnya </h4>
+    <div class="progress-bar">
+      <div class="progress-fill"></div>
+    </div>
+  </div>
+  <div style="font-size:40px;">🧴</div>
+</div>
 
-const API = "https://script.google.com/macros/s/AKfycbwNh0O6Abaj4lquaQhKCIY6ObY32HE77qNNPVRRl6dx_mSy6KNzP_xLgEhyfUIwTrx5/exec";
-let chartInstance;
-
-// LOGIN
-async function login(){
-  let res = await fetch(`${API}?action=login&username=${username.value}&password=${password.value}`);
-  let d = await res.json();
-
-  if(d.status=="success"){
-    localStorage.setItem("email", d.email);
-    localStorage.setItem("nama", d.nama);
-    localStorage.setItem("target", d.target);
-    showDashboard();
-  } else alert("Login gagal");
-}
-
-// REGISTER
-async function register(){
-  let res = await fetch(`${API}?action=register&username=${usernameReg.value}&password=${passwordReg.value}&nama=${nama.value}`);
-  let d = await res.json();
-
-  alert(d.status=="success" ? "Berhasil daftar" : "Gagal");
-}
-
-// DASHBOARD
-function showDashboard(){
-  auth.classList.add("hidden");
-  dashboard.classList.remove("hidden");
-
-  userDisplay.innerText = localStorage.getItem("nama");
-  targetDisplay.innerText = localStorage.getItem("target");
-
-  loadTotal();
-  loadChart();
-}
-
-// INPUT
-async function kirimMinyak(){
-  let user = localStorage.getItem("email");
-
-  if(!inputMinyak.value){
-    alert("Isi dulu");
-    return;
-  }
-
-  await fetch(`${API}?action=tambahMinyak&username=${user}&jumlah=${inputMinyak.value}`);
-
-  inputMinyak.value="";
-  loadTotal();
-}
-
-// TOTAL
-async function loadTotal(){
-  let user = localStorage.getItem("email");
-  let target = Number(localStorage.getItem("target"));
-
-  let res = await fetch(`${API}?action=totalMinyak&username=${user}`);
-  let d = await res.json();
-
-  let total = d.total;
-
-  totalMinyak.innerText = total+" L";
-
-  let persen = target>0 ? (total/target)*100 : 0;
-  if(persen>100) persen=100;
-
-  progressBar.style.width = persen+"%";
-  progressText.innerText = persen.toFixed(1)+"%";
-}
-
-// CHART
-async function loadChart(){
-  let res = await fetch(`${API}?action=harga`);
-  let d = await res.json();
-
-  if(chartInstance){
-    chartInstance.destroy();
-  }
-
-  chartInstance = new Chart(chart,{
-    type:"line",
-    data:{
-      labels:d.map(x=>x.tanggal),
-      datasets:[{
-        data:d.map(x=>x.harga),
-        tension:0.4,
-        fill:true
-      }]
-    }
-  });
-}
-
-// REALTIME
-setInterval(() => {
-  if(localStorage.getItem("email")){
-    loadTotal();
-  }
-}, 5000);
-
-setInterval(() => {
-  if(localStorage.getItem("email")){
-    loadChart();
-  }
-}, 10000);
-
-// LOGOUT
-function logout(){
-  localStorage.clear();
-  location.reload();
-}
-
-// AUTO LOGIN
-if(localStorage.getItem("email")){
-  showDashboard();
-}
-
-</script>
+<!-- NAVBAR -->
+<div class="navbar">
+  <div class="nav-item active">Beranda</div>
+  <div class="nav-item">Dampak Hijau</div>
+  <div class="nav-item">Profil</div>
+</div>
 
 </body>
 </html>
