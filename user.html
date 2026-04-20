@@ -60,7 +60,11 @@ body{
 }
 
 .header-text h3{
-  font-size:16px;
+  font-size:14px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  max-width:120px;
 }
 
 /* CARD GREEN */
@@ -75,25 +79,54 @@ body{
 /* SALDO */
 .saldo-container{
   display:grid;
-  grid-template-columns:repeat(2, minmax(0, 1fr));
+  grid-template-columns:auto auto;
   gap:10px;
+  justify-content:start;
+  align-items:start;
 }
 
 .saldo-box{
-  flex:1;
   background:#fff;
   color:#000;
   border-radius:15px;
-  padding:10px;
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  gap:8px;
+  position:relative;
+  width:auto;
+  min-width:0;
 }
 
 .saldo-box h4{
   font-size:14px;
-  margin-bottom:5px;
+  margin-bottom:8px;
+  padding-right:90px;
 }
 
 .saldo-box p{
   font-weight:bold;
+}
+
+.saldo-box-action .saldo-action-btn{
+  position:absolute;
+  top:16px;
+  right:16px;
+}
+
+.saldo-action-btn{
+  border:none;
+  background:linear-gradient(135deg,#0aa66c,#0d8f5a);
+  color:#fff;
+  border-radius:12px;
+  padding:8px 14px;
+  font-size:12px;
+  cursor:pointer;
+}
+
+.saldo-action-btn:hover{
+  opacity:0.95;
 }
 
 /* MENU */
@@ -278,40 +311,6 @@ body{
   }
 }
 
-/* PENCAPAIAN */
-.pencapaian{
-  margin:15px;
-  background:#fff;
-  padding:15px;
-  border-radius:15px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-
-.progress{
-  width:70%;
-}
-
-.pencapaian-icon{
-  font-size:40px;
-  line-height:1;
-}
-
-.progress-bar{
-  height:6px;
-  background:#ddd;
-  border-radius:10px;
-  margin-top:8px;
-}
-
-.progress-fill{
-  width:40%;
-  height:100%;
-  background:#4caf50;
-  border-radius:10px;
-}
-
 /* NAVBAR */
 .navbar{
   position:fixed;
@@ -345,8 +344,7 @@ body{
 
   .header,
   .card,
-  .map-section,
-  .pencapaian{
+  .map-section{
     margin-left:0;
     margin-right:0;
   }
@@ -425,19 +423,6 @@ body{
     margin-top:8px;
   }
 
-  .pencapaian{
-    gap:12px;
-    align-items:flex-start;
-  }
-
-  .progress{
-    width:100%;
-  }
-
-  .pencapaian-icon{
-    font-size:34px;
-  }
-
   .navbar{
     padding:10px 4px calc(10px + env(safe-area-inset-bottom));
   }
@@ -454,15 +439,13 @@ body{
 
   .header,
   .card,
-  .map-section,
-  .pencapaian{
+  .map-section{
     margin-left:0;
     margin-right:0;
   }
 
   .card,
-  .price-chart,
-  .pencapaian{
+  .price-chart{
     border-radius:22px;
   }
 
@@ -483,8 +466,7 @@ body{
 
   .header,
   .card,
-  .map-section,
-  .pencapaian{
+  .map-section{
     margin-left:0;
     margin-right:0;
   }
@@ -495,8 +477,7 @@ body{
   }
 
   .card,
-  .price-chart,
-  .pencapaian{
+  .price-chart{
     border-radius:24px;
   }
 
@@ -504,8 +485,7 @@ body{
     padding:20px;
   }
 
-  .saldo-box,
-  .pencapaian{
+  .saldo-box{
     padding:18px;
   }
 
@@ -557,7 +537,8 @@ body{
 <div class="card">
 
   <div class="saldo-container">
-    <div class="saldo-box">
+    <div class="saldo-box saldo-box-action">
+      <button class="saldo-action-btn" type="button">Tarik</button>
       <h4>Saldo</h4>
       <p>RP 0</p>
     </div>
@@ -570,7 +551,6 @@ body{
   <div class="menu">
     <div class="menu-item">Capaian</div>
     <div class="menu-item">Informasi</div>
-    <div class="menu-item">Tarik</div>
     <div class="menu-item">Mutasi</div>
   </div>
 
@@ -584,10 +564,6 @@ body{
       <div>
         <h4>Pergerakan Harga Mingguan</h4>
         <p>Pembaruan terakhir: hari ini</p>
-      </div>
-      <div class="chart-price">
-        <strong id="weekly-average-price">Rp 0</strong>
-        <span id="weekly-change-info" class="neutral">Menunggu data</span>
       </div>
     </div>
 
@@ -607,24 +583,11 @@ body{
   </div>
 </div>
 
-<!-- PENCAPAIAN -->
-<div class="pencapaian">
-  <div class="progress">
-    <h4>25 Liter ke tingkat berikutnya </h4>
-    <div class="progress-bar">
-      <div class="progress-fill"></div>
-    </div>
-  </div>
-  <div class="pencapaian-icon">🧴</div>
-</div>
-
 </div>
 
 <!-- NAVBAR -->
 <div class="navbar">
   <div class="nav-item active">Beranda</div>
-  <div class="nav-item">Dampak Hijau</div>
-  <div class="nav-item">Profil</div>
 </div>
 
 <script>
@@ -694,8 +657,6 @@ function renderReward(rewardValue) {
 
 function renderChartData(data) {
   const chartGrid = document.querySelector(".chart-grid");
-  const averagePrice = document.querySelector("#weekly-average-price");
-  const changeInfo = document.querySelector("#weekly-change-info");
 
   if (!chartGrid || !Array.isArray(data) || !data.length) {
     return;
@@ -707,28 +668,7 @@ function renderChartData(data) {
   const max = Math.max(...prices);
   const min = Math.min(...prices);
   const range = max - min || 1;
-  const average = prices.reduce((total, price) => total + price, 0) / prices.length;
-  const firstPrice = prices[0];
-  const lastPrice = prices[prices.length - 1];
-  const changePercent = firstPrice ? ((lastPrice - firstPrice) / firstPrice) * 100 : 0;
 
-  if (averagePrice) {
-    averagePrice.textContent = formatRupiah(average);
-  }
-
-  if (changeInfo) {
-    changeInfo.classList.remove("neutral", "down");
-
-    if (changePercent > 0) {
-      changeInfo.textContent = `Naik ${changePercent.toFixed(1).replace(".", ",")}% minggu ini`;
-    } else if (changePercent < 0) {
-      changeInfo.textContent = `Turun ${Math.abs(changePercent).toFixed(1).replace(".", ",")}% minggu ini`;
-      changeInfo.classList.add("down");
-    } else {
-      changeInfo.textContent = "Stabil minggu ini";
-      changeInfo.classList.add("neutral");
-    }
-  }
 
   data.forEach((item) => {
     const height = ((Number(item.harga) - min) / range) * 100;
