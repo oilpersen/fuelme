@@ -677,29 +677,18 @@ document.querySelector("#logout-btn").addEventListener("click", () => {
 });
 
 // ============ ORIGINAL CODE ============
-const API_URL = "https://script.google.com/macros/s/AKfycbyOIEysQ_JJYPooluxYB5VTIYsQfl73Cbj61nkpplOkzYxURcbBShu-TDco3w04hBCY/exec"; // ganti
-const ADMIN_STORAGE_KEY = "dashboardAdminSettings";
+const API_URL = "https://script.google.com/macros/s/AKfycbxXTGHPvkZ97XYMHKj00LZRGt4pMo0QO_H228lZCoyZzHA84llMm2dQFqmxb4FgATwg/exec";
 
 function formatRupiah(value) {
   return `Rp ${Math.round(value).toLocaleString("id-ID")}`;
 }
 
-function getAdminSettings() {
-  try {
-    const stored = localStorage.getItem(ADMIN_STORAGE_KEY);
-    return stored ? JSON.parse(stored) : null;
-  } catch (error) {
-    return null;
-  }
-}
-
-function renderReward() {
+function renderReward(rewardValue) {
   const rewardElement = document.querySelector("#reward-per-liter");
-  const adminSettings = getAdminSettings();
-  const rewardValue = Number(adminSettings?.rewardPerLiter) || 0;
+  const value = Number(rewardValue) || 0;
 
   if (rewardElement) {
-    rewardElement.textContent = formatRupiah(rewardValue);
+    rewardElement.textContent = formatRupiah(value);
   }
 }
 
@@ -788,28 +777,25 @@ async function loadChart() {
       priceChart.classList.add("loading");
     }
 
-    const adminSettings = getAdminSettings();
-    const adminChartData = Array.isArray(adminSettings?.chartData)
-      ? adminSettings.chartData.filter((item) => item?.hari && item?.harga !== undefined)
-      : [];
-
-    if (adminChartData.length) {
-      renderChartData(adminChartData);
-      return;
+    // Fetch data dari Google Sheets via Apps Script
+    const response = await fetch(API_URL);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
     }
 
-    if (API_URL === "URL_WEB_APP_KAMU") {
-      return;
+    const data = await response.json();
+    console.log("Data dari sheet:", data);
+
+    // Render chart jika ada data chart
+    if (Array.isArray(data.chart) && data.chart.length > 0) {
+      renderChartData(data.chart);
     }
 
-    const res = await fetch(API_URL);
-    const data = await res.json();
-
-    if (!Array.isArray(data) || data.length === 0) {
-      return;
+    // Render reward jika ada
+    if (data.reward !== undefined) {
+      renderReward(data.reward);
     }
 
-    renderChartData(data);
   } catch (err) {
     console.error("Gagal load grafik:", err);
   } finally {
@@ -820,7 +806,6 @@ async function loadChart() {
 }
 
 lockInteractions();
-renderReward();
 loadChart();
 </script>
 
