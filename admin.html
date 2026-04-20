@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
+}
+
+:root{
+  --bg:#f3f6f4;
+  --surface:#ffffff;
+  --surface-soft:#eef7f1;
+  --primary:#0f9f63;
+  --primary-dark:#0a6c43;
+  --primary-soft:#dff8ea;
+  --text:#132018;
+  --muted:#667085;
+  --border:#d6e6da;
+  --danger:#dc2626;
+  --shadow:0 20px 45px rgba(16, 77, 49, 0.08);
+}
+
+body{
+  background:
+    radial-gradient(circle at top right, rgba(34, 197, 94, 0.14), transparent 28%),
+    linear-gradient(180deg, #f8fbf9 0%, var(--bg) 100%);
+  color:var(--text);
+}
+
+.app-shell{
+  width:min(100%, 1200px);
+  margin:0 auto;
+  padding:20px 16px 36px;
+}
+
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:18px;
+}
+
+.header-copy small{
+  color:var(--primary);
+  font-weight:600;
+  letter-spacing:0.04em;
+  text-transform:uppercase;
+}
+
+.header-copy h1{
+  font-size:clamp(1.6rem, 3vw, 2.5rem);
+  margin-top:6px;
+}
+
+.header-copy p{
+  color:var(--muted);
+  margin-top:8px;
+}
+
+.header-badge{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:10px 14px;
+  font-size:13px;
+  font-weight:600;
+  box-shadow:var(--shadow);
+}
+
+.dashboard-grid{
+  display:grid;
+  grid-template-columns:1.15fr 0.85fr;
+  gap:18px;
+  align-items:start;
+}
+
+.panel{
+  background:var(--surface);
+  border:1px solid rgba(15, 159, 99, 0.08);
+  border-radius:24px;
+  box-shadow:var(--shadow);
+}
+
+.panel-header{
+  padding:22px 22px 0;
+}
+
+.panel-header h2{
+  font-size:1.1rem;
+}
+
+.panel-header p{
+  color:var(--muted);
+  margin-top:6px;
+  font-size:13px;
+}
+
+.panel-body{
+  padding:22px;
+}
+
+.control-card{
+  display:grid;
+  gap:16px;
+}
+
+.reward-box{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:14px;
+  align-items:end;
+  background:linear-gradient(135deg, rgba(15, 159, 99, 0.09), rgba(34, 197, 94, 0.04));
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:18px;
+}
+
+.field{
+  display:grid;
+  gap:8px;
+}
+
+.field label{
+  font-size:13px;
+  font-weight:600;
+  color:var(--text);
+}
+
+.field input{
+  width:100%;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:12px 14px;
+  font-size:15px;
+  color:var(--text);
+  background:#fff;
+  outline:none;
+  transition:border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.field input:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 4px rgba(15, 159, 99, 0.12);
+}
+
+.reward-preview{
+  min-width:180px;
+  padding:14px 16px;
+  border-radius:18px;
+  background:var(--surface);
+  border:1px solid var(--border);
+}
+
+.reward-preview small{
+  display:block;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.reward-preview strong{
+  display:block;
+  margin-top:6px;
+  font-size:1.5rem;
+  color:var(--primary-dark);
+}
+
+.section-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.section-title h3{
+  font-size:1rem;
+}
+
+.section-title p{
+  color:var(--muted);
+  font-size:13px;
+}
+
+.chart-form-list{
+  display:grid;
+  gap:12px;
+  margin-top:14px;
+}
+
+.chart-row{
+  display:grid;
+  grid-template-columns:1fr 1fr auto;
+  gap:12px;
+  align-items:end;
+  padding:14px;
+  border:1px solid var(--border);
+  border-radius:18px;
+  background:#fcfefd;
+}
+
+.icon-btn,
+.primary-btn,
+.secondary-btn{
+  border:none;
+  border-radius:14px;
+  cursor:pointer;
+  font-weight:600;
+  transition:transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.icon-btn:hover,
+.primary-btn:hover,
+.secondary-btn:hover{
+  transform:translateY(-1px);
+}
+
+.icon-btn{
+  width:44px;
+  height:44px;
+  background:#fff1f2;
+  color:var(--danger);
+  border:1px solid #fecdd3;
+}
+
+.primary-btn{
+  background:linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color:#fff;
+  padding:12px 18px;
+  box-shadow:0 14px 30px rgba(15, 159, 99, 0.24);
+}
+
+.secondary-btn{
+  background:var(--surface-soft);
+  color:var(--primary-dark);
+  padding:12px 18px;
+  border:1px solid var(--border);
+}
+
+.action-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:18px;
+}
+
+.status-text{
+  margin-top:14px;
+  min-height:20px;
+  font-size:13px;
+  color:var(--muted);
+}
+
+.status-text.success{
+  color:var(--primary-dark);
+}
+
+.status-text.error{
+  color:var(--danger);
+}
+
+.preview-grid{
+  display:grid;
+  gap:18px;
+}
+
+.summary-cards{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:12px;
+}
+
+.summary-card{
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:16px;
+  background:linear-gradient(180deg, #ffffff, #f7fcf9);
+}
+
+.summary-card small{
+  color:var(--muted);
+}
+
+.summary-card strong{
+  display:block;
+  margin-top:8px;
+  font-size:1.35rem;
+  color:var(--primary-dark);
+}
+
+.price-chart{
+  background:#fbfefc;
+  border:1px solid var(--border);
+  border-radius:22px;
+  padding:18px 16px 14px;
+}
+
+.chart-header{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+  margin-bottom:14px;
+}
+
+.chart-header p{
+  color:var(--muted);
+  font-size:12px;
+  margin-top:4px;
+}
+
+.chart-price{
+  text-align:right;
+}
+
+.chart-price strong{
+  display:block;
+  font-size:1.6rem;
+  color:var(--primary-dark);
+}
+
+.chart-price span{
+  font-size:12px;
+  color:#16a34a;
+}
+
+.chart-price span.down{
+  color:var(--danger);
+}
+
+.chart-price span.neutral{
+  color:var(--muted);
+}
+
+.chart-grid{
+  position:relative;
+  height:220px;
+  padding-left:46px;
+  display:flex;
+  align-items:flex-end;
+  gap:12px;
+  border-bottom:1px solid var(--border);
+}
+
+.chart-grid::before{
+  content:"";
+  position:absolute;
+  inset:0 0 0 46px;
+  background:linear-gradient(to top, rgba(15, 159, 99, 0.08) 1px, transparent 1px);
+  background-size:100% 55px;
+  pointer-events:none;
+}
+
+.y-labels{
+  position:absolute;
+  left:0;
+  top:0;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  font-size:11px;
+  color:var(--muted);
+}
+
+.chart-bar{
+  flex:1;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  align-items:center;
+  position:relative;
+  z-index:1;
+}
+
+.bar-fill{
+  width:100%;
+  max-width:36px;
+  border-radius:16px 16px 7px 7px;
+  background:linear-gradient(180deg, #34d399, #0f9f63);
+  box-shadow:0 14px 24px rgba(15, 159, 99, 0.2);
+  position:relative;
+}
+
+.bar-fill::before{
+  content:attr(data-price);
+  position:absolute;
+  top:-28px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:10px;
+  color:var(--primary-dark);
+  background:var(--primary-soft);
+  padding:4px 7px;
+  border-radius:999px;
+  white-space:nowrap;
+}
+
+.chart-bar span{
+  margin-top:10px;
+  font-size:11px;
+  color:var(--muted);
+}
+
+.info-box{
+  border:1px dashed var(--border);
+  background:#f8fcfa;
+  border-radius:18px;
+  padding:16px;
+}
+
+.info-box p{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.6;
+}
+
+@media (max-width: 900px){
+  .dashboard-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+@media (max-width: 640px){
+  .app-shell{
+    padding:16px 12px 28px;
+  }
+
+  .header{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .reward-box,
+  .chart-row,
+  .summary-cards,
+  .chart-header{
+    grid-template-columns:1fr;
+    flex-direction:column;
+  }
+
+  .chart-grid{
+    height:180px;
+    gap:8px;
+    padding-left:36px;
+  }
+
+  .chart-grid::before{
+    inset:0 0 0 36px;
+  }
+
+  .bar-fill{
+    max-width:26px;
+  }
+
+  .bar-fill::before{
+    font-size:9px;
+    top:-24px;
+    padding:3px 5px;
+  }
+
+  .chart-price{
+    text-align:left;
+  }
+}
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="header">
+    <div class="header-copy">
+      <small>Panel Admin</small>
+      <h1>Halaman Admin Fullme</h1>
+      <p>Atur nilai reward per liter dan ubah data grafik mingguan langsung dari halaman ini.</p>
+    </div>
+    <div style="display:flex; gap:12px; align-items:center;">
+      <div class="header-badge" id="save-badge">Belum ada perubahan</div>
+      <div id="admin-user-info" style="display:flex; align-items:center; gap:10px; padding:10px 14px; background:rgba(15,159,99,0.08); border-radius:999px; font-size:13px;">
+        <span id="admin-username">Admin</span>
+        <button id="logout-btn" type="button" style="background:none; border:none; color:#0f9f63; cursor:pointer; font-weight:600; text-decoration:underline;">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Pengaturan Dashboard</h2>
+        <p>Perubahan disimpan di browser dan bisa dipakai oleh halaman dashboard pada browser yang sama.</p>
+      </div>
+      <div class="panel-body">
+        <div class="control-card">
+          <div class="reward-box">
+            <div class="field">
+              <label for="reward-input">Reward per Liter</label>
+              <input id="reward-input" type="number" min="0" step="100" placeholder="Contoh: 500">
+            </div>
+            <div class="reward-preview">
+              <small>Preview reward</small>
+              <strong id="reward-preview">Rp 0</strong>
+            </div>
+          </div>
+
+          <div>
+            <div class="section-title">
+              <div>
+                <h3>Data Grafik Mingguan</h3>
+                <p>Ubah nama hari dan nominal harga per liter sesuai kebutuhan.</p>
+              </div>
+              <button class="secondary-btn" type="button" id="add-row-btn">Tambah Data</button>
+            </div>
+            <div class="chart-form-list" id="chart-form-list"></div>
+          </div>
+
+          <div class="action-row">
+            <button class="primary-btn" type="button" id="save-btn">Simpan Perubahan</button>
+            <button class="secondary-btn" type="button" id="reset-btn">Reset Default</button>
+          </div>
+          <div class="status-text" id="status-text"></div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="preview-grid">
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Preview Dashboard</h2>
+          <p>Hasil di bawah akan ikut berubah saat form diubah.</p>
+        </div>
+        <div class="panel-body">
+          <div class="summary-cards">
+            <div class="summary-card">
+              <small>Reward/Liter</small>
+              <strong id="reward-card-value">Rp 0</strong>
+            </div>
+            <div class="summary-card">
+              <small>Rata-rata Harga</small>
+              <strong id="weekly-average-price">Rp 0</strong>
+            </div>
+          </div>
+
+          <div class="price-chart">
+            <div class="chart-header">
+              <div>
+                <h3>Grafik Harga per Liter</h3>
+                <p id="last-update-text">Preview data admin</p>
+              </div>
+              <div class="chart-price">
+                <strong id="latest-price">Rp 0</strong>
+                <span id="weekly-change-info" class="neutral">Menunggu data</span>
+              </div>
+            </div>
+
+            <div class="chart-grid" id="chart-grid">
+              <div class="y-labels" id="y-labels"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Catatan</h2>
+        </div>
+        <div class="panel-body">
+          <div class="info-box">
+            <p>Bagian saldo sudah dihapus dari halaman admin. Admin sekarang fokus untuk mengatur reward dan sumber data grafik. Jika nanti Anda ingin data tersimpan ke Google Sheets atau Apps Script, struktur form ini sudah siap disambungkan.</p>
+          </div>
+        </div>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<script>
+// ============ AUTH CHECK ============
+function checkAdminAuth() {
+  const user = localStorage.getItem("user");
+  
+  if (!user) {
+    window.location.href = "index.html";
+    return null;
+  }
+
+  try {
+    const userData = JSON.parse(user);
+    
+    // Verifikasi role adalah admin
+    if (userData.role !== "admin") {
+      localStorage.removeItem("user");
+      window.location.href = "index.html";
+      return null;
+    }
+
+    return userData;
+  } catch (error) {
+    localStorage.removeItem("user");
+    window.location.href = "index.html";
+    return null;
+  }
+}
+
+const currentUser = checkAdminAuth();
+
+// Update username di header
+if (currentUser) {
+  const usernameElement = document.querySelector("#admin-username");
+  if (usernameElement) {
+    usernameElement.textContent = currentUser.nama || currentUser.username;
+  }
+}
+
+// Logout handler
+document.querySelector("#logout-btn").addEventListener("click", () => {
+  localStorage.removeItem("user");
+  window.location.href = "index.html";
+});
+
+// ============ ORIGINAL CODE ============
+const API_URL = "https://script.google.com/macros/s/AKfycbyOIEysQ_JJYPooluxYB5VTIYsQfl73Cbj61nkpplOkzYxURcbBShu-TDco3w04hBCY/exec";
+const ADMIN_STORAGE_KEY = "dashboardAdminSettings";
+const DEFAULT_SETTINGS = {
+  rewardPerLiter: 0,
+  chartData: [
+    { hari: "Sen", harga: 6200 },
+    { hari: "Sel", harga: 6350 },
+    { hari: "Rab", harga: 6500 },
+    { hari: "Kam", harga: 6400 },
+    { hari: "Jum", harga: 6650 },
+    { hari: "Sab", harga: 6720 },
+    { hari: "Min", harga: 6800 }
+  ]
+};
+
+const rewardInput = document.querySelector("#reward-input");
+const rewardPreview = document.querySelector("#reward-preview");
+const rewardCardValue = document.querySelector("#reward-card-value");
+const chartFormList = document.querySelector("#chart-form-list");
+const chartGrid = document.querySelector("#chart-grid");
+const yLabels = document.querySelector("#y-labels");
+const weeklyAveragePrice = document.querySelector("#weekly-average-price");
+const latestPrice = document.querySelector("#latest-price");
+const weeklyChangeInfo = document.querySelector("#weekly-change-info");
+const lastUpdateText = document.querySelector("#last-update-text");
+const statusText = document.querySelector("#status-text");
+const saveBadge = document.querySelector("#save-badge");
+
+let currentSettings = loadSettings();
+
+function formatRupiah(value) {
+  return `Rp ${Math.round(Number(value) || 0).toLocaleString("id-ID")}`;
+}
+
+function loadSettings() {
+  try {
+    const stored = localStorage.getItem(ADMIN_STORAGE_KEY);
+
+    if (!stored) {
+      return structuredClone(DEFAULT_SETTINGS);
+    }
+
+    const parsed = JSON.parse(stored);
+    const chartData = Array.isArray(parsed.chartData) && parsed.chartData.length
+      ? parsed.chartData.map((item) => ({
+          hari: item.hari || "",
+          harga: Number(item.harga) || 0
+        }))
+      : DEFAULT_SETTINGS.chartData;
+
+    return {
+      rewardPerLiter: Number(parsed.rewardPerLiter) || 0,
+      chartData
+    };
+  } catch (error) {
+    return structuredClone(DEFAULT_SETTINGS);
+  }
+}
+
+function persistSettings() {
+  localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(currentSettings));
+}
+
+function normalizeSettings(payload) {
+  const chartSource = Array.isArray(payload?.chartData)
+    ? payload.chartData
+    : Array.isArray(payload?.chart)
+      ? payload.chart
+      : [];
+
+  return {
+    rewardPerLiter: Number(payload?.rewardPerLiter ?? payload?.reward) || 0,
+    chartData: chartSource.length
+      ? chartSource.map((item) => ({
+          hari: String(item.hari || "").trim(),
+          harga: Number(item.harga) || 0
+        }))
+      : structuredClone(DEFAULT_SETTINGS.chartData)
+  };
+}
+
+function hasSettingsPayload(payload) {
+  return payload && (
+    Object.prototype.hasOwnProperty.call(payload, "rewardPerLiter") ||
+    Object.prototype.hasOwnProperty.call(payload, "reward") ||
+    Array.isArray(payload.chartData) ||
+    Array.isArray(payload.chart)
+  );
+}
+
+async function loadSettingsFromDatabase() {
+  const response = await fetch(API_URL, {
+    method: "GET",
+    headers: {
+      "Accept": "application/json"
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
+  }
+
+  const payload = await response.json();
+  return normalizeSettings(payload);
+}
+
+async function saveSettingsToDatabase(settings) {
+  const payload = {
+    action: "update",
+    reward: Number(settings.rewardPerLiter) || 0,
+    chart: settings.chartData.map((item) => ({
+      hari: item.hari,
+      harga: Number(item.harga) || 0
+    }))
+  };
+
+  const response = await fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
+  }
+
+  const rawText = await response.text();
+
+  if (!rawText.trim()) {
+    return payload;
+  }
+
+  try {
+    const parsed = JSON.parse(rawText);
+    return hasSettingsPayload(parsed) ? normalizeSettings(parsed) : normalizeSettings(payload);
+  } catch (error) {
+    return normalizeSettings(payload);
+  }
+}
+
+function renderForm() {
+  rewardInput.value = currentSettings.rewardPerLiter;
+  rewardPreview.textContent = formatRupiah(currentSettings.rewardPerLiter);
+  rewardCardValue.textContent = formatRupiah(currentSettings.rewardPerLiter);
+
+  chartFormList.innerHTML = "";
+
+  currentSettings.chartData.forEach((item, index) => {
+    const row = document.createElement("div");
+    row.className = "chart-row";
+    row.innerHTML = `
+      <div class="field">
+        <label for="hari-${index}">Hari</label>
+        <input id="hari-${index}" type="text" value="${item.hari}" maxlength="12" data-field="hari" data-index="${index}">
+      </div>
+      <div class="field">
+        <label for="harga-${index}">Harga per Liter</label>
+        <input id="harga-${index}" type="number" min="0" step="100" value="${item.harga}" data-field="harga" data-index="${index}">
+      </div>
+      <button class="icon-btn" type="button" data-remove-index="${index}" aria-label="Hapus data">✕</button>
+    `;
+
+    chartFormList.appendChild(row);
+  });
+}
+
+function renderYAxis(min, max) {
+  const stepCount = 4;
+  yLabels.innerHTML = "";
+
+  for (let i = 0; i <= stepCount; i += 1) {
+    const value = max - ((max - min) / stepCount) * i;
+    const label = document.createElement("span");
+    label.textContent = `${(value / 1000).toFixed(1)}k`;
+    yLabels.appendChild(label);
+  }
+}
+
+function renderPreview() {
+  rewardPreview.textContent = formatRupiah(currentSettings.rewardPerLiter);
+  rewardCardValue.textContent = formatRupiah(currentSettings.rewardPerLiter);
+
+  chartGrid.querySelectorAll(".chart-bar").forEach((bar) => bar.remove());
+
+  const validData = currentSettings.chartData.filter((item) => item.hari && Number(item.harga) >= 0);
+
+  if (!validData.length) {
+    weeklyAveragePrice.textContent = formatRupiah(0);
+    latestPrice.textContent = formatRupiah(0);
+    weeklyChangeInfo.textContent = "Belum ada data";
+    weeklyChangeInfo.className = "neutral";
+    yLabels.innerHTML = "";
+    return;
+  }
+
+  const prices = validData.map((item) => Number(item.harga));
+  const max = Math.max(...prices);
+  const min = Math.min(...prices);
+  const range = max - min || 1;
+  const average = prices.reduce((total, price) => total + price, 0) / prices.length;
+  const firstPrice = prices[0];
+  const lastPrice = prices[prices.length - 1];
+  const changePercent = firstPrice ? ((lastPrice - firstPrice) / firstPrice) * 100 : 0;
+
+  renderYAxis(min, max);
+
+  weeklyAveragePrice.textContent = formatRupiah(average);
+  latestPrice.textContent = formatRupiah(lastPrice);
+  lastUpdateText.textContent = `Preview ${validData.length} data harga`;
+
+  weeklyChangeInfo.className = "";
+  if (changePercent > 0) {
+    weeklyChangeInfo.textContent = `Naik ${changePercent.toFixed(1).replace(".", ",")}% minggu ini`;
+  } else if (changePercent < 0) {
+    weeklyChangeInfo.textContent = `Turun ${Math.abs(changePercent).toFixed(1).replace(".", ",")}% minggu ini`;
+    weeklyChangeInfo.classList.add("down");
+  } else {
+    weeklyChangeInfo.textContent = "Stabil minggu ini";
+    weeklyChangeInfo.classList.add("neutral");
+  }
+
+  validData.forEach((item) => {
+    const height = ((Number(item.harga) - min) / range) * 100;
+    const bar = document.createElement("div");
+    bar.className = "chart-bar";
+    bar.innerHTML = `
+      <div class="bar-fill" data-price="${Number(item.harga).toLocaleString("id-ID")}" style="height:${Math.max(height, 12)}%"></div>
+      <span>${item.hari}</span>
+    `;
+    chartGrid.appendChild(bar);
+  });
+}
+
+function syncFormValue(index, field, value) {
+  if (!currentSettings.chartData[index]) {
+    return;
+  }
+
+  currentSettings.chartData[index][field] = field === "harga" ? Number(value) || 0 : value;
+  renderPreview();
+}
+
+function setStatus(message, type = "") {
+  statusText.textContent = message;
+  statusText.className = `status-text${type ? ` ${type}` : ""}`;
+}
+
+function refreshBadge(message) {
+  saveBadge.textContent = message;
+}
+
+rewardInput.addEventListener("input", (event) => {
+  currentSettings.rewardPerLiter = Number(event.target.value) || 0;
+  renderPreview();
+  refreshBadge("Perubahan belum disimpan");
+});
+
+chartFormList.addEventListener("input", (event) => {
+  const index = Number(event.target.dataset.index);
+  const field = event.target.dataset.field;
+
+  if (Number.isNaN(index) || !field) {
+    return;
+  }
+
+  syncFormValue(index, field, event.target.value);
+  refreshBadge("Perubahan belum disimpan");
+});
+
+chartFormList.addEventListener("click", (event) => {
+  const removeIndex = event.target.dataset.removeIndex;
+
+  if (removeIndex === undefined) {
+    return;
+  }
+
+  currentSettings.chartData.splice(Number(removeIndex), 1);
+  renderForm();
+  renderPreview();
+  refreshBadge("Perubahan belum disimpan");
+});
+
+document.querySelector("#add-row-btn").addEventListener("click", () => {
+  currentSettings.chartData.push({ hari: `Hari ${currentSettings.chartData.length + 1}`, harga: 0 });
+  renderForm();
+  renderPreview();
+  refreshBadge("Perubahan belum disimpan");
+});
+
+document.querySelector("#save-btn").addEventListener("click", async () => {
+  const validRows = currentSettings.chartData.filter((item) => item.hari.trim() !== "");
+
+  if (!validRows.length) {
+    setStatus("Minimal isi satu data grafik sebelum disimpan.", "error");
+    return;
+  }
+
+  currentSettings.chartData = validRows;
+  setStatus("Menyimpan perubahan ke database...", "");
+  refreshBadge("Menyimpan...");
+
+  try {
+    const savedSettings = await saveSettingsToDatabase(currentSettings);
+    currentSettings = normalizeSettings(savedSettings);
+    persistSettings();
+    renderForm();
+    renderPreview();
+    setStatus("Perubahan admin berhasil disimpan ke database.", "success");
+    refreshBadge("Sinkron dengan database");
+  } catch (error) {
+    persistSettings();
+    renderForm();
+    renderPreview();
+    setStatus("Gagal menyimpan ke database. Data tetap disimpan lokal di browser ini.", "error");
+    refreshBadge("Gagal sinkron");
+  }
+});
+
+document.querySelector("#reset-btn").addEventListener("click", () => {
+  currentSettings = structuredClone(DEFAULT_SETTINGS);
+  persistSettings();
+  renderForm();
+  renderPreview();
+  setStatus("Pengaturan dikembalikan ke data default.", "success");
+  refreshBadge("Data default aktif");
+});
+
+async function initializeAdminPage() {
+  renderForm();
+  renderPreview();
+  setStatus("Mengambil data dari database...", "");
+  refreshBadge("Memuat database...");
+
+  try {
+    currentSettings = await loadSettingsFromDatabase();
+    persistSettings();
+    renderForm();
+    renderPreview();
+    setStatus("Data berhasil dimuat dari database.", "success");
+    refreshBadge("Terhubung ke database");
+  } catch (error) {
+    renderForm();
+    renderPreview();
+    setStatus("Database tidak bisa diambil. Menampilkan data lokal terakhir.", "error");
+    refreshBadge("Mode lokal");
+  }
+}
+
+initializeAdminPage();
+</script>
+</body>
+</html>

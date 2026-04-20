@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Akun</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
+}
+
+:root{
+  --bg:#edf6f1;
+  --surface:#ffffff;
+  --primary:#0f9f63;
+  --primary-dark:#0b6e45;
+  --primary-soft:#ddf7ea;
+  --text:#15231b;
+  --muted:#6b7280;
+  --border:#d7e7dc;
+  --danger:#dc2626;
+  --shadow:0 24px 60px rgba(11, 110, 69, 0.14);
+}
+
+body{
+  min-height:100vh;
+  color:var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(15, 159, 99, 0.16), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(52, 211, 153, 0.16), transparent 22%),
+    linear-gradient(180deg, #f8fbf9 0%, var(--bg) 100%);
+}
+
+.auth-shell{
+  min-height:100vh;
+  width:min(100%, 1180px);
+  margin:0 auto;
+  padding:24px 16px;
+  display:grid;
+  grid-template-columns:1.05fr 0.95fr;
+  gap:20px;
+  align-items:center;
+}
+
+.hero-card,
+.auth-card{
+  background:rgba(255, 255, 255, 0.92);
+  border:1px solid rgba(15, 159, 99, 0.08);
+  border-radius:28px;
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(8px);
+}
+
+.hero-card{
+  padding:34px;
+  background:
+    linear-gradient(160deg, rgba(15, 159, 99, 0.92), rgba(11, 110, 69, 0.95)),
+    #0f9f63;
+  color:#fff;
+  overflow:hidden;
+  position:relative;
+}
+
+.hero-card::before,
+.hero-card::after{
+  content:"";
+  position:absolute;
+  border-radius:999px;
+  background:rgba(255, 255, 255, 0.08);
+}
+
+.hero-card::before{
+  width:220px;
+  height:220px;
+  top:-60px;
+  right:-40px;
+}
+
+.hero-card::after{
+  width:150px;
+  height:150px;
+  bottom:-30px;
+  left:-30px;
+}
+
+.hero-tag{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:rgba(255, 255, 255, 0.14);
+  border:1px solid rgba(255, 255, 255, 0.18);
+  border-radius:999px;
+  padding:10px 14px;
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:0.04em;
+  text-transform:uppercase;
+}
+
+.hero-card h1{
+  margin-top:18px;
+  font-size:clamp(2rem, 4vw, 3.35rem);
+  line-height:1.12;
+  max-width:11ch;
+}
+
+.hero-card p{
+  margin-top:14px;
+  max-width:52ch;
+  color:rgba(255, 255, 255, 0.88);
+  line-height:1.7;
+}
+
+.hero-points{
+  display:grid;
+  gap:12px;
+  margin-top:28px;
+}
+
+.hero-point{
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+  padding:14px 16px;
+  border-radius:18px;
+  background:rgba(255, 255, 255, 0.1);
+  border:1px solid rgba(255, 255, 255, 0.12);
+}
+
+.hero-point strong{
+  display:block;
+  font-size:14px;
+}
+
+.hero-point span{
+  display:block;
+  margin-top:4px;
+  color:rgba(255, 255, 255, 0.82);
+  font-size:13px;
+}
+
+.auth-card{
+  padding:24px;
+}
+
+.auth-tabs{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:10px;
+  background:#f5faf7;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:6px;
+}
+
+.tab-btn{
+  border:none;
+  border-radius:12px;
+  padding:12px 14px;
+  font-size:14px;
+  font-weight:600;
+  background:transparent;
+  color:var(--muted);
+  cursor:pointer;
+  transition:all 0.2s ease;
+}
+
+.tab-btn.active{
+  background:linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color:#fff;
+  box-shadow:0 14px 28px rgba(15, 159, 99, 0.2);
+}
+
+.auth-panel{
+  display:none;
+  margin-top:22px;
+}
+
+.auth-panel.active{
+  display:block;
+}
+
+.panel-copy h2{
+  font-size:1.6rem;
+}
+
+.panel-copy p{
+  margin-top:8px;
+  color:var(--muted);
+  line-height:1.6;
+}
+
+.auth-form{
+  display:grid;
+  gap:16px;
+  margin-top:22px;
+}
+
+.field{
+  display:grid;
+  gap:8px;
+}
+
+.field label{
+  font-size:13px;
+  font-weight:600;
+}
+
+.field input{
+  width:100%;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:13px 14px;
+  font-size:14px;
+  color:var(--text);
+  background:#fff;
+  outline:none;
+  transition:border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.field input:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 4px rgba(15, 159, 99, 0.12);
+}
+
+.row-inline{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.remember{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:var(--muted);
+  font-size:13px;
+}
+
+.remember input{
+  accent-color:var(--primary);
+}
+
+.link-btn,
+.text-link{
+  background:none;
+  border:none;
+  color:var(--primary-dark);
+  font-weight:600;
+  cursor:pointer;
+  text-decoration:none;
+}
+
+.submit-btn{
+  border:none;
+  border-radius:16px;
+  padding:14px 18px;
+  background:linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color:#fff;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 16px 32px rgba(15, 159, 99, 0.22);
+}
+
+.submit-btn:hover{
+  transform:translateY(-1px);
+}
+
+.helper{
+  margin-top:18px;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.6;
+}
+
+.status-box{
+  margin-top:18px;
+  min-height:22px;
+  font-size:13px;
+  font-weight:600;
+}
+
+.status-box.success{
+  color:var(--primary-dark);
+}
+
+.status-box.error{
+  color:var(--danger);
+}
+
+@media (max-width: 920px){
+  .auth-shell{
+    grid-template-columns:1fr;
+  }
+}
+
+@media (max-width: 640px){
+  .auth-shell{
+    padding:14px;
+    display:flex;
+    flex-direction:column-reverse;
+  }
+
+  .hero-card,
+  .auth-card{
+    border-radius:22px;
+    padding:20px;
+  }
+
+  .hero-card h1{
+    max-width:none;
+  }
+}
+</style>
+</head>
+<body>
+  <section class="auth-card">
+    <div class="auth-tabs">
+      <button class="tab-btn active" type="button" data-target="login-panel">Login</button>
+      <button class="tab-btn" type="button" data-target="register-panel">Register</button>
+    </div>
+
+    <div class="auth-panel active" id="login-panel">
+      <div class="panel-copy">
+        <h2>Masuk Akun</h2>
+        <p>Jika sudah memiliki akun, masukkan username dan password Anda di bawah ini.</p>
+      </div>
+
+      <form class="auth-form" id="login-form">
+        <div class="field">
+          <label for="login-username">Username</label>
+          <input id="login-username" name="username" type="text" placeholder="Masukkan username" required>
+        </div>
+
+        <div class="field">
+          <label for="login-password">Password</label>
+          <input id="login-password" name="password" type="password" placeholder="Masukkan password" required>
+        </div>
+
+        <div class="row-inline">
+          <label class="remember">
+            <input type="checkbox" name="remember">
+            <span>Ingat saya</span>
+          </label>
+          <button class="link-btn" type="button">Lupa password?</button>
+        </div>
+
+        <button class="submit-btn" type="submit">Login Sekarang</button>
+      </form>
+
+      <div class="helper">
+        Belum punya akun?
+        <button class="link-btn" type="button" data-switch="register-panel">Buka halaman register</button>
+      </div>
+      <div class="status-box" id="login-status"></div>
+    </div>
+
+    <div class="auth-panel" id="register-panel">
+      <div class="panel-copy">
+        <h2>Daftar Akun Baru</h2>
+        <p>Jika belum memiliki akun, isi form berikut untuk register terlebih dahulu.</p>
+      </div>
+
+      <form class="auth-form" id="register-form">
+        <div class="field">
+          <label for="register-name">Nama Lengkap</label>
+          <input id="register-name" name="name" type="text" placeholder="Masukkan nama lengkap" required>
+        </div>
+
+        <div class="field">
+          <label for="register-username">Username</label>
+          <input id="register-username" name="username" type="text" placeholder="Buat username" required>
+        </div>
+
+        <div class="field">
+          <label for="register-password">Password</label>
+          <input id="register-password" name="password" type="password" placeholder="Buat password" required>
+        </div>
+
+        <div class="field">
+          <label for="register-confirm-password">Konfirmasi Password</label>
+          <input id="register-confirm-password" name="confirmPassword" type="password" placeholder="Ulangi password" required>
+        </div>
+
+        <button class="submit-btn" type="submit">Daftar Sekarang</button>
+      </form>
+
+      <div class="helper">
+        Sudah punya akun?
+        <button class="link-btn" type="button" data-switch="login-panel">Kembali ke login</button>
+      </div>
+      <div class="status-box" id="register-status"></div>
+    </div>
+  </section>
+<div class="auth-shell">
+  <section class="hero-card">
+    <div class="hero-tag">Akses Dashboard</div>
+    <h1>Masuk ke akun Anda dengan cepat.</h1>
+    <p>Pengguna yang sudah memiliki akun cukup memasukkan username dan password. Jika belum punya akun, silakan daftar melalui form register di halaman yang sama.</p>
+
+    <div class="hero-points">
+      <div class="hero-point">
+        <div>🔐</div>
+        <div>
+          <strong>Login cepat</strong>
+          <span>Masukkan username dan password untuk langsung masuk.</span>
+        </div>
+      </div>
+      <div class="hero-point">
+        <div>📝</div>
+        <div>
+          <strong>Register mudah</strong>
+          <span>Buat akun baru lewat tab register jika belum memiliki akun.</span>
+        </div>
+      </div>
+      <div class="hero-point">
+        <div>📱</div>
+        <div>
+          <strong>Responsif</strong>
+          <span>Tampilan tetap nyaman di Android, tablet, dan laptop.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const tabButtons = document.querySelectorAll(".tab-btn");
+const panels = document.querySelectorAll(".auth-panel");
+const switchButtons = document.querySelectorAll("[data-switch]");
+const loginStatus = document.querySelector("#login-status");
+const registerStatus = document.querySelector("#register-status");
+
+// Google Apps Script URL
+const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyOIEysQ_JJYPooluxYB5VTIYsQfl73Cbj61nkpplOkzYxURcbBShu-TDco3w04hBCY/exec";
+
+function activatePanel(targetId) {
+  tabButtons.forEach((button) => {
+    button.classList.toggle("active", button.dataset.target === targetId);
+  });
+
+  panels.forEach((panel) => {
+    panel.classList.toggle("active", panel.id === targetId);
+  });
+}
+
+tabButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    activatePanel(button.dataset.target);
+  });
+});
+
+switchButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    activatePanel(button.dataset.switch);
+  });
+});
+
+// LOGIN HANDLER
+document.querySelector("#login-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const formData = new FormData(event.currentTarget);
+  const username = String(formData.get("username") || "").trim();
+  const password = String(formData.get("password") || "").trim();
+
+  if (!username || !password) {
+    loginStatus.textContent = "Username dan password wajib diisi.";
+    loginStatus.className = "status-box error";
+    return;
+  }
+
+  const submitBtn = event.currentTarget.querySelector(".submit-btn");
+  const originalText = submitBtn.textContent;
+  submitBtn.textContent = "Sedang login...";
+  submitBtn.disabled = true;
+
+  try {
+    const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+      method: "POST",
+      body: new URLSearchParams({
+        action: "login",
+        username: username,
+        password: password
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Server error: ${response.status} ${response.statusText}`);
+    }
+
+    const responseText = await response.text();
+    console.log("RAW RESPONSE:", responseText);
+
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+    } catch (e) {
+      throw new Error("Response bukan JSON: " + responseText);
+    }
+
+    if (responseData.status === "success") {
+      loginStatus.textContent = `Login berhasil! Selamat datang ${responseData.nama}.`;
+      loginStatus.className = "status-box success";
+      
+      // Simpan data user ke localStorage
+      localStorage.setItem("user", JSON.stringify({
+        nama: responseData.nama,
+        username: responseData.username,
+        role: responseData.role
+      }));
+
+      // Redirect berdasarkan role
+      setTimeout(() => {
+        if (responseData.role === "admin") {
+          window.location.href = "admin.html";
+        } else {
+          window.location.href = "user.html";
+        }
+      }, 1000);
+    } else {
+      loginStatus.textContent = "Username atau password salah!";
+      loginStatus.className = "status-box error";
+    }
+  } catch (error) {
+    loginStatus.textContent = `Error: ${error.message}`;
+    loginStatus.className = "status-box error";
+  } finally {
+    submitBtn.textContent = originalText;
+    submitBtn.disabled = false;
+  }
+});
+
+// REGISTER HANDLER
+document.getElementById("register-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const form = document.getElementById("register-form");
+
+  const formData = new FormData(form);
+  const name = String(formData.get("name") || "").trim();
+  const username = String(formData.get("username") || "").trim();
+  const password = String(formData.get("password") || "").trim();
+  const confirmPassword = String(formData.get("confirmPassword") || "").trim();
+
+  if (!name || !username || !password || !confirmPassword) {
+    registerStatus.textContent = "Semua field wajib diisi.";
+    registerStatus.className = "status-box error";
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    registerStatus.textContent = "Password tidak sama.";
+    registerStatus.className = "status-box error";
+    return;
+  }
+
+  try {
+    const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+      method: "POST",
+      body: new URLSearchParams({
+        action: "register",
+        name,
+        username,
+        password
+      })
+    });
+
+    const res = await response.json();
+
+    if (res.status === "success") {
+      registerStatus.textContent = "Register berhasil!";
+      registerStatus.className = "status-box success";
+
+      form.reset(); // ✅ aman
+    } else if (res.status === "exists") {
+      registerStatus.textContent = "Username sudah dipakai!";
+      registerStatus.className = "status-box error";
+    } else {
+      registerStatus.textContent = "Gagal register!";
+      registerStatus.className = "status-box error";
+    }
+
+  } catch (err) {
+    registerStatus.textContent = err.message;
+    registerStatus.className = "status-box error";
+  }
+});
+</script>
+</body>
+</html>

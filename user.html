@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
+}
+
+body{
+  background:#f2f4f7;
+  color:#111827;
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+}
+
+.app-shell{
+  width:min(100%, 1180px);
+  margin:0 auto;
+  padding:8px 12px 92px;
+}
+
+/* HEADER */
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:15px;
+}
+
+.profile{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.avatar{
+  width:45px;
+  height:45px;
+  background:#1b5e20;
+  color:#fff;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+}
+
+.header-text small{
+  color:#4caf50;
+}
+
+.header-text h3{
+  font-size:16px;
+}
+
+/* CARD GREEN */
+.card{
+  margin:15px;
+  background:linear-gradient(135deg,#0aa66c,#0d8f5a);
+  border-radius:20px;
+  padding:15px;
+  color:#fff;
+}
+
+/* SALDO */
+.saldo-container{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:10px;
+}
+
+.saldo-box{
+  flex:1;
+  background:#fff;
+  color:#000;
+  border-radius:15px;
+  padding:10px;
+}
+
+.saldo-box h4{
+  font-size:14px;
+  margin-bottom:5px;
+}
+
+.saldo-box p{
+  font-weight:bold;
+}
+
+/* MENU */
+.menu{
+  margin-top:15px;
+  display:grid;
+  grid-template-columns:repeat(4, minmax(0, 1fr));
+  gap:10px;
+}
+
+.menu-item{
+  background:#0a5f2f;
+  padding:10px;
+  border-radius:12px;
+  text-align:center;
+  color:#fff;
+  font-size:12px;
+}
+
+/* GRAFIK HARGA */
+.map-section{
+  margin:15px;
+}
+
+.price-chart{
+  margin-top:12px;
+  background:#fff;
+  border-radius:18px;
+  padding:18px 16px 14px;
+  box-shadow:0 10px 30px rgba(12, 79, 48, 0.08);
+  position:relative;
+}
+
+.chart-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:16px;
+}
+
+.chart-header p{
+  font-size:12px;
+  color:#6b7280;
+  margin-top:4px;
+}
+
+.chart-price{
+  text-align:right;
+}
+
+.chart-price strong{
+  display:block;
+  font-size:24px;
+  color:#14532d;
+}
+
+.chart-price span{
+  font-size:12px;
+  color:#16a34a;
+}
+
+.chart-price span.neutral{
+  color:#6b7280;
+}
+
+.chart-price span.down{
+  color:#dc2626;
+}
+
+.chart-grid{
+  position:relative;
+  height:180px;
+  padding-left:42px;
+  display:flex;
+  align-items:flex-end;
+  gap:12px;
+  border-bottom:1px solid #dbe4dc;
+}
+
+.chart-grid::before{
+  content:"";
+  position:absolute;
+  inset:0 0 0 42px;
+  background:
+    linear-gradient(to top, rgba(22, 163, 74, 0.08) 1px, transparent 1px);
+  background-size:100% 45px;
+  pointer-events:none;
+}
+
+.y-labels{
+  position:absolute;
+  left:0;
+  top:0;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  font-size:11px;
+  color:#6b7280;
+}
+
+.chart-bar{
+  flex:1;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-end;
+  height:100%;
+  z-index:1;
+}
+
+.chart-bar span{
+  font-size:11px;
+  color:#6b7280;
+  margin-top:10px;
+  text-align:center;
+}
+
+.bar-fill{
+  width:100%;
+  max-width:34px;
+  border-radius:14px 14px 6px 6px;
+  background:linear-gradient(180deg,#22c55e,#15803d);
+  position:relative;
+  box-shadow:0 10px 20px rgba(21, 128, 61, 0.18);
+}
+
+.bar-fill::before{
+  content:attr(data-price);
+  position:absolute;
+  top:-26px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:10px;
+  color:#14532d;
+  background:#dcfce7;
+  padding:3px 6px;
+  border-radius:999px;
+  white-space:nowrap;
+}
+
+.chart-loading{
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  background:rgba(255, 255, 255, 0.9);
+  border-radius:18px;
+  opacity:0;
+  visibility:hidden;
+  transition:opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.price-chart.loading .chart-loading{
+  opacity:1;
+  visibility:visible;
+}
+
+.loading-spinner{
+  width:42px;
+  height:42px;
+  border:4px solid #dcfce7;
+  border-top-color:#16a34a;
+  border-radius:50%;
+  animation:spin 0.85s linear infinite;
+}
+
+.chart-loading p{
+  font-size:13px;
+  font-weight:600;
+  color:#166534;
+}
+
+@keyframes spin{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
+/* PENCAPAIAN */
+.pencapaian{
+  margin:15px;
+  background:#fff;
+  padding:15px;
+  border-radius:15px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.progress{
+  width:70%;
+}
+
+.pencapaian-icon{
+  font-size:40px;
+  line-height:1;
+}
+
+.progress-bar{
+  height:6px;
+  background:#ddd;
+  border-radius:10px;
+  margin-top:8px;
+}
+
+.progress-fill{
+  width:40%;
+  height:100%;
+  background:#4caf50;
+  border-radius:10px;
+}
+
+/* NAVBAR */
+.navbar{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  background:#fff;
+  display:flex;
+  justify-content:space-around;
+  padding:10px 0;
+  border-top:1px solid #ddd;
+  box-shadow:0 -10px 30px rgba(15, 23, 42, 0.08);
+  z-index:1000;
+}
+
+.nav-item{
+  text-align:center;
+  font-size:12px;
+  color:#999;
+  position:relative;
+  z-index:1001;
+}
+
+.nav-item.active{
+  color:#1b5e20;
+}
+
+@media (max-width: 767px){
+  .app-shell{
+    padding:8px 10px 88px;
+  }
+
+  .header,
+  .card,
+  .map-section,
+  .pencapaian{
+    margin-left:0;
+    margin-right:0;
+  }
+
+  .header{
+    padding:12px 4px;
+  }
+
+  .card{
+    padding:14px;
+    border-radius:18px;
+  }
+
+  .saldo-container{
+    grid-template-columns:1fr;
+  }
+
+  .menu{
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+  }
+
+  .menu-item{
+    font-size:13px;
+    padding:12px 10px;
+  }
+
+  .map-section > h3{
+    font-size:18px;
+  }
+
+  .price-chart{
+    padding:16px 12px 14px;
+    border-radius:16px;
+  }
+
+  .chart-header{
+    flex-direction:column;
+    align-items:flex-start;
+    margin-bottom:12px;
+  }
+
+  .chart-price{
+    text-align:left;
+  }
+
+  .chart-price strong{
+    font-size:22px;
+  }
+
+  .chart-grid{
+    height:165px;
+    gap:8px;
+    padding-left:36px;
+  }
+
+  .chart-grid::before{
+    inset:0 0 0 36px;
+  }
+
+  .y-labels{
+    font-size:10px;
+  }
+
+  .bar-fill{
+    max-width:26px;
+  }
+
+  .bar-fill::before{
+    font-size:9px;
+    top:-24px;
+    padding:2px 5px;
+  }
+
+  .chart-bar span{
+    font-size:10px;
+    margin-top:8px;
+  }
+
+  .pencapaian{
+    gap:12px;
+    align-items:flex-start;
+  }
+
+  .progress{
+    width:100%;
+  }
+
+  .pencapaian-icon{
+    font-size:34px;
+  }
+
+  .navbar{
+    padding:10px 4px calc(10px + env(safe-area-inset-bottom));
+  }
+
+  .nav-item{
+    font-size:11px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px){
+  .app-shell{
+    padding:16px 20px 96px;
+  }
+
+  .header,
+  .card,
+  .map-section,
+  .pencapaian{
+    margin-left:0;
+    margin-right:0;
+  }
+
+  .card,
+  .price-chart,
+  .pencapaian{
+    border-radius:22px;
+  }
+
+  .menu-item{
+    padding:12px 10px;
+    font-size:13px;
+  }
+
+  .chart-grid{
+    height:210px;
+  }
+}
+
+@media (min-width: 1024px){
+  .app-shell{
+    padding:24px 24px 110px;
+  }
+
+  .header,
+  .card,
+  .map-section,
+  .pencapaian{
+    margin-left:0;
+    margin-right:0;
+  }
+
+  .header{
+    padding-left:4px;
+    padding-right:4px;
+  }
+
+  .card,
+  .price-chart,
+  .pencapaian{
+    border-radius:24px;
+  }
+
+  .card{
+    padding:20px;
+  }
+
+  .saldo-box,
+  .pencapaian{
+    padding:18px;
+  }
+
+  .menu-item{
+    padding:14px 12px;
+  }
+
+  .price-chart{
+    padding:22px 20px 18px;
+  }
+
+  .chart-grid{
+    height:240px;
+    gap:16px;
+  }
+
+  .bar-fill{
+    max-width:42px;
+  }
+
+  .navbar{
+    left:50%;
+    transform:translateX(-50%);
+    width:min(100%, 1180px);
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="app-shell">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="profile">
+    <div class="avatar" id="user-avatar">U</div>
+    <div class="header-text">
+      <small>Selamat datang kembali,</small>
+      <h3 id="user-name">User</h3>
+    </div>
+  </div>
+  <div style="display:flex; gap:12px; align-items:center;">
+    🔔
+    <button id="logout-btn" type="button" style="background:none; border:none; color:#dc2626; cursor:pointer; font-weight:600; font-size:14px;">Logout</button>
+  </div>
+</div>
+
+<!-- CARD -->
+<div class="card">
+
+  <div class="saldo-container">
+    <div class="saldo-box">
+      <h4>Saldo</h4>
+      <p>RP 0</p>
+    </div>
+    <div class="saldo-box">
+      <h4>Reward/Liter</h4>
+      <p id="reward-per-liter">Rp 0</p>
+    </div>
+  </div>
+
+  <div class="menu">
+    <div class="menu-item">Capaian</div>
+    <div class="menu-item">Informasi</div>
+    <div class="menu-item">Tarik</div>
+    <div class="menu-item">Mutasi</div>
+  </div>
+
+</div>
+
+<!-- GRAFIK HARGA -->
+<div class="map-section">
+  <h3>Grafik Harga per Liter</h3>
+  <div class="price-chart loading">
+    <div class="chart-header">
+      <div>
+        <h4>Pergerakan Harga Mingguan</h4>
+        <p>Pembaruan terakhir: hari ini</p>
+      </div>
+      <div class="chart-price">
+        <strong id="weekly-average-price">Rp 0</strong>
+        <span id="weekly-change-info" class="neutral">Menunggu data</span>
+      </div>
+    </div>
+
+    <div class="chart-grid">
+      <div class="y-labels">
+        <span>7.0k</span>
+        <span>6.8k</span>
+        <span>6.6k</span>
+        <span>6.4k</span>
+        <span>6.2k</span>
+      </div>
+    </div>
+    <div class="chart-loading">
+      <div class="loading-spinner"></div>
+      <p>Mengambil data harga...</p>
+    </div>
+  </div>
+</div>
+
+<!-- PENCAPAIAN -->
+<div class="pencapaian">
+  <div class="progress">
+    <h4>25 Liter ke tingkat berikutnya </h4>
+    <div class="progress-bar">
+      <div class="progress-fill"></div>
+    </div>
+  </div>
+  <div class="pencapaian-icon">🧴</div>
+</div>
+
+</div>
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <div class="nav-item active">Beranda</div>
+  <div class="nav-item">Dampak Hijau</div>
+  <div class="nav-item">Profil</div>
+</div>
+
+<script>
+// ============ AUTH CHECK ============
+function checkUserAuth() {
+  const user = localStorage.getItem("user");
+  
+  if (!user) {
+    window.location.href = "index.html";
+    return null;
+  }
+
+  try {
+    const userData = JSON.parse(user);
+    
+    // Verifikasi role adalah user
+    if (userData.role !== "user" && userData.role !== "admin") {
+      localStorage.removeItem("user");
+      window.location.href = "index.html";
+      return null;
+    }
+
+    return userData;
+  } catch (error) {
+    localStorage.removeItem("user");
+    window.location.href = "index.html";
+    return null;
+  }
+}
+
+const currentUser = checkUserAuth();
+
+// Update profile info
+if (currentUser) {
+  const nameElement = document.querySelector("#user-name");
+  const avatarElement = document.querySelector("#user-avatar");
+  if (nameElement) {
+    nameElement.textContent = currentUser.nama || currentUser.username;
+  }
+  if (avatarElement) {
+    const initials = (currentUser.nama || currentUser.username || "U").charAt(0).toUpperCase();
+    avatarElement.textContent = initials;
+  }
+}
+
+// Logout handler
+document.querySelector("#logout-btn").addEventListener("click", () => {
+  localStorage.removeItem("user");
+  window.location.href = "index.html";
+});
+
+// ============ ORIGINAL CODE ============
+const API_URL = "https://script.google.com/macros/s/AKfycbyOIEysQ_JJYPooluxYB5VTIYsQfl73Cbj61nkpplOkzYxURcbBShu-TDco3w04hBCY/exec"; // ganti
+const ADMIN_STORAGE_KEY = "dashboardAdminSettings";
+
+function formatRupiah(value) {
+  return `Rp ${Math.round(value).toLocaleString("id-ID")}`;
+}
+
+function getAdminSettings() {
+  try {
+    const stored = localStorage.getItem(ADMIN_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : null;
+  } catch (error) {
+    return null;
+  }
+}
+
+function renderReward() {
+  const rewardElement = document.querySelector("#reward-per-liter");
+  const adminSettings = getAdminSettings();
+  const rewardValue = Number(adminSettings?.rewardPerLiter) || 0;
+
+  if (rewardElement) {
+    rewardElement.textContent = formatRupiah(rewardValue);
+  }
+}
+
+function renderChartData(data) {
+  const chartGrid = document.querySelector(".chart-grid");
+  const averagePrice = document.querySelector("#weekly-average-price");
+  const changeInfo = document.querySelector("#weekly-change-info");
+
+  if (!chartGrid || !Array.isArray(data) || !data.length) {
+    return;
+  }
+
+  chartGrid.querySelectorAll(".chart-bar").forEach((el) => el.remove());
+
+  const prices = data.map((d) => Number(d.harga));
+  const max = Math.max(...prices);
+  const min = Math.min(...prices);
+  const range = max - min || 1;
+  const average = prices.reduce((total, price) => total + price, 0) / prices.length;
+  const firstPrice = prices[0];
+  const lastPrice = prices[prices.length - 1];
+  const changePercent = firstPrice ? ((lastPrice - firstPrice) / firstPrice) * 100 : 0;
+
+  if (averagePrice) {
+    averagePrice.textContent = formatRupiah(average);
+  }
+
+  if (changeInfo) {
+    changeInfo.classList.remove("neutral", "down");
+
+    if (changePercent > 0) {
+      changeInfo.textContent = `Naik ${changePercent.toFixed(1).replace(".", ",")}% minggu ini`;
+    } else if (changePercent < 0) {
+      changeInfo.textContent = `Turun ${Math.abs(changePercent).toFixed(1).replace(".", ",")}% minggu ini`;
+      changeInfo.classList.add("down");
+    } else {
+      changeInfo.textContent = "Stabil minggu ini";
+      changeInfo.classList.add("neutral");
+    }
+  }
+
+  data.forEach((item) => {
+    const height = ((Number(item.harga) - min) / range) * 100;
+
+    const bar = document.createElement("div");
+    bar.className = "chart-bar";
+
+    bar.innerHTML = `
+      <div class="bar-fill" data-price="${item.harga}" style="height:${Math.max(height, 12)}%"></div>
+      <span>${item.hari}</span>
+    `;
+
+    chartGrid.appendChild(bar);
+  });
+}
+
+function lockInteractions() {
+  const blockedEvents = ["copy", "cut", "contextmenu", "selectstart", "dragstart"];
+
+  blockedEvents.forEach((eventName) => {
+    document.addEventListener(eventName, (event) => {
+      event.preventDefault();
+    });
+  });
+
+  document.addEventListener("keydown", (event) => {
+    const key = event.key.toLowerCase();
+    const isCtrlOrMeta = event.ctrlKey || event.metaKey;
+
+    if (
+      key === "printscreen" ||
+      (isCtrlOrMeta && ["a", "c", "p", "s", "u", "x"].includes(key)) ||
+      (event.ctrlKey && event.shiftKey && ["i", "j", "c"].includes(key)) ||
+      key === "f12"
+    ) {
+      event.preventDefault();
+    }
+  });
+}
+
+async function loadChart() {
+  const priceChart = document.querySelector(".price-chart");
+
+  try {
+    if (priceChart) {
+      priceChart.classList.add("loading");
+    }
+
+    const adminSettings = getAdminSettings();
+    const adminChartData = Array.isArray(adminSettings?.chartData)
+      ? adminSettings.chartData.filter((item) => item?.hari && item?.harga !== undefined)
+      : [];
+
+    if (adminChartData.length) {
+      renderChartData(adminChartData);
+      return;
+    }
+
+    if (API_URL === "URL_WEB_APP_KAMU") {
+      return;
+    }
+
+    const res = await fetch(API_URL);
+    const data = await res.json();
+
+    if (!Array.isArray(data) || data.length === 0) {
+      return;
+    }
+
+    renderChartData(data);
+  } catch (err) {
+    console.error("Gagal load grafik:", err);
+  } finally {
+    if (priceChart) {
+      priceChart.classList.remove("loading");
+    }
+  }
+}
+
+lockInteractions();
+renderReward();
+loadChart();
+</script>
+
+</body>
+</html>
