@@ -349,6 +349,141 @@ body{
   }
 }
 
+/* POPUP JUAL */
+.popup-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0, 0, 0, 0.5);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:2000;
+  opacity:0;
+  visibility:hidden;
+  transition:opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.popup-overlay.active{
+  opacity:1;
+  visibility:visible;
+}
+
+.popup-content{
+  background:#fff;
+  border-radius:20px;
+  padding:24px;
+  width:min(90%, 340px);
+  box-shadow:0 20px 60px rgba(0, 0, 0, 0.3);
+  transform:scale(0.9);
+  transition:transform 0.25s ease;
+}
+
+.popup-overlay.active .popup-content{
+  transform:scale(1);
+}
+
+.popup-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.popup-header h3{
+  font-size:18px;
+  color:#14532d;
+}
+
+.popup-close{
+  background:none;
+  border:none;
+  font-size:24px;
+  color:#6b7280;
+  cursor:pointer;
+  line-height:1;
+}
+
+.popup-body{
+  margin-bottom:20px;
+}
+
+.popup-body label{
+  display:block;
+  font-size:14px;
+  color:#374151;
+  margin-bottom:8px;
+}
+
+.popup-body .harga-info{
+  font-size:13px;
+  color:#16a34a;
+  margin-bottom:12px;
+}
+
+.popup-body input{
+  width:100%;
+  padding:14px;
+  border:2px solid #e5e7eb;
+  border-radius:12px;
+  font-size:16px;
+  outline:none;
+  transition:border-color 0.2s ease;
+}
+
+.popup-body input:focus{
+  border-color:#16a34a;
+}
+
+.popup-body .total{
+  margin-top:16px;
+  padding:14px;
+  background:#f0fdf4;
+  border-radius:12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.popup-body .total span{
+  color:#166534;
+}
+
+.popup-body .total strong{
+  font-size:18px;
+  color:#14532d;
+}
+
+.popup-footer{
+  display:flex;
+  gap:12px;
+}
+
+.popup-footer button{
+  flex:1;
+  padding:14px;
+  border-radius:12px;
+  font-size:15px;
+  font-weight:600;
+  cursor:pointer;
+  transition:opacity 0.2s ease;
+}
+
+.popup-footer .btn-batal{
+  background:#f3f4f6;
+  border:2px solid #e5e7eb;
+  color:#374151;
+}
+
+.popup-footer .btn-jual{
+  background:linear-gradient(135deg, #0aa66c, #0d8f5a);
+  border:none;
+  color:#fff;
+}
+
+.popup-footer button:hover{
+  opacity:0.9;
+}
+
 /* NAVBAR */
 .navbar{
   position:fixed;
@@ -632,6 +767,32 @@ body{
 
 </div>
 
+<!-- POPUP JUAL MINYAK -->
+<div class="popup-overlay">
+  <div class="popup-content">
+    <div class="popup-header">
+      <h3>Jual minyak</h3>
+      <button class="popup-close">&times;</button>
+    </div>
+    <div class="popup-body">
+      <label>Harga per Liter</label>
+      <div class="harga-info" id="popup-harga">Rp 0</div>
+      
+      <label>Berapa Liter?</label>
+      <input type="number" id="popup-liter" placeholder="Masukkan jumlah liter" min="1">
+      
+      <div class="total">
+        <span>Total</span>
+        <strong id="popup-total">Rp 0</strong>
+      </div>
+    </div>
+    <div class="popup-footer">
+      <button class="btn-batal">Batal</button>
+      <button class="btn-jual">Jual Sekarang</button>
+    </div>
+  </div>
+</div>
+
 <!-- NAVBAR -->
 <div class="navbar">
   <div class="nav-item active">Beranda</div>
@@ -818,6 +979,77 @@ function renderSaldo(saldoValue) {
     saldoElement.textContent = formatRupiah(value);
   }
 }
+
+// ============ POPUP JUAL MINYAK ============
+let currentRewardPerLiter = 0;
+
+function showJualPopup() {
+  const rewardElement = document.querySelector("#reward-per-liter");
+  const rewardText = rewardElement?.textContent.replace("Rp ", "").replace(/\./g, "") || "0";
+  currentRewardPerLiter = parseInt(rewardText) || 0;
+  
+  document.querySelector("#popup-harga").textContent = formatRupiah(currentRewardPerLiter);
+  document.querySelector("#popup-liter").value = "";
+  document.querySelector("#popup-total").textContent = "Rp 0";
+  document.querySelector(".popup-overlay").classList.add("active");
+}
+
+function hideJualPopup() {
+  document.querySelector(".popup-overlay").classList.remove("active");
+}
+
+function updateTotal() {
+  const liter = parseInt(document.querySelector("#popup-liter").value) || 0;
+  const total = liter * currentRewardPerLiter;
+  document.querySelector("#popup-total").textContent = formatRupiah(total);
+}
+
+function kirimKeWhatsApp() {
+  const liter = parseInt(document.querySelector("#popup-liter").value) || 0;
+  
+  if (liter <= 0) {
+    alert("Masukkan jumlah liter yang ingin dijual!");
+    return;
+  }
+  
+  const total = liter * currentRewardPerLiter;
+  const userData = JSON.parse(localStorage.getItem("user") || "{}");
+  const namaUser = userData.nama || userData.username || "User";
+  
+  // Nomor WhatsApp tujuan (ganti dengan nomor yang benar)
+  const noWA = "081392375768";
+  
+  const pesan = `*PESANAN JUAL MINYAK*
+
+Nama: ${namaUser}
+Jumlah: ${liter} Liter
+Harga/Liter: ${formatRupiah(currentRewardPerLiter)}
+Total: ${formatRupiah(total)}
+
+Mohon diproses, terima kasih.`;
+  
+  const urlWA = `https://wa.me/${noWA}?text=${encodeURIComponent(pesen)}`;
+  window.open(urlWA, "_blank");
+  
+  hideJualPopup();
+}
+
+// Event listeners
+document.querySelectorAll(".saldo-action-btn").forEach((btn, index) => {
+  btn.addEventListener("click", () => {
+    if (index === 1) { // Button Jual (index 1)
+      showJualPopup();
+    }
+  });
+});
+
+document.querySelector(".popup-close").addEventListener("click", hideJualPopup);
+document.querySelector(".popup-overlay").addEventListener("click", (e) => {
+  if (e.target === e.currentTarget) hideJualPopup();
+});
+document.querySelector("#popup-liter").addEventListener("input", updateTotal);
+document.querySelector(".btn-jual").addEventListener("click", kirimKeWhatsApp);
+document.querySelector(".btn-batal").addEventListener("click", hideJualPopup);
 
 lockInteractions();
 loadChart();
