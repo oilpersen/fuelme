@@ -290,6 +290,44 @@ body{
   visibility:visible;
 }
 
+/* CARD LOADING */
+.card-loading{
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  background:rgba(255, 255, 255, 0.92);
+  border-radius:15px;
+  opacity:0;
+  visibility:hidden;
+  transition:opacity 0.25s ease, visibility 0.25s ease;
+  z-index:10;
+}
+
+.saldo-box.loading .card-loading,
+.saldo-box.loading .card-loading{
+  opacity:1;
+  visibility:visible;
+}
+
+.card-loading .loading-spinner{
+  width:28px;
+  height:28px;
+  border:3px solid #e5e7eb;
+  border-top-color:#16a34a;
+  border-radius:50%;
+  animation:spin 0.85s linear infinite;
+}
+
+.card-loading p{
+  font-size:11px;
+  font-weight:600;
+  color:#166534;
+}
+
 .loading-spinner{
   width:42px;
   height:42px;
@@ -537,14 +575,23 @@ body{
 <div class="card">
 
   <div class="saldo-container">
-    <div class="saldo-box saldo-box-action">
+    <div class="saldo-box saldo-box-action loading" id="saldo-box" style="position:relative;">
       <button class="saldo-action-btn" type="button">Tarik</button>
       <h4>Saldo</h4>
-      <p>RP 0</p>
+      <p id="user-saldo">Rp 0</p>
+      <div class="card-loading">
+        <div class="loading-spinner"></div>
+        <p>Mengambil data...</p>
+      </div>
     </div>
-    <div class="saldo-box">
+    <div class="saldo-box saldo-box-action loading" id="reward-box" style="position:relative;">
+      <button class="saldo-action-btn" type="button">Jual</button>
       <h4>Reward/Liter</h4>
       <p id="reward-per-liter">Rp 0</p>
+      <div class="card-loading">
+        <div class="loading-spinner"></div>
+        <p>Mengambil data...</p>
+      </div>
     </div>
   </div>
 
@@ -711,10 +758,18 @@ function lockInteractions() {
 
 async function loadChart() {
   const priceChart = document.querySelector(".price-chart");
+  const saldoBox = document.querySelector("#saldo-box");
+  const rewardBox = document.querySelector("#reward-box");
 
   try {
     if (priceChart) {
       priceChart.classList.add("loading");
+    }
+    if (saldoBox) {
+      saldoBox.classList.add("loading");
+    }
+    if (rewardBox) {
+      rewardBox.classList.add("loading");
     }
 
     // Fetch data dari Google Sheets via Apps Script
@@ -731,6 +786,11 @@ async function loadChart() {
       renderChartData(data.chart);
     }
 
+    // Render saldo jika ada
+    if (data.saldo !== undefined) {
+      renderSaldo(data.saldo);
+    }
+
     // Render reward jika ada
     if (data.reward !== undefined) {
       renderReward(data.reward);
@@ -742,6 +802,20 @@ async function loadChart() {
     if (priceChart) {
       priceChart.classList.remove("loading");
     }
+    if (saldoBox) {
+      saldoBox.classList.remove("loading");
+    }
+    if (rewardBox) {
+      rewardBox.classList.remove("loading");
+    }
+  }
+}
+
+function renderSaldo(saldoValue) {
+  const saldoElement = document.querySelector("#user-saldo");
+  const value = Number(saldoValue) || 0;
+  if (saldoElement) {
+    saldoElement.textContent = formatRupiah(value);
   }
 }
 
