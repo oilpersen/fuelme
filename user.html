@@ -1017,7 +1017,7 @@ function kirimKeWhatsApp() {
   const namaUser = userData.nama || userData.username || "User";
   
   // Nomor WhatsApp tujuan (ganti dengan nomor yang benar)
-  const noWA = "081392375768";
+  const noWA = "6281392375768";
   
   const pesan = `*PESANAN JUAL MINYAK*
 
@@ -1028,20 +1028,21 @@ Total: ${formatRupiah(total)}
 
 Mohon diproses, terima kasih.`;
   
-  const urlWA = `https://wa.me/${noWA}?text=${encodeURIComponent(pesen)}`;
+  const urlWA = `https://wa.me/${noWA}?text=${encodeURIComponent(pesan)}`;
   window.open(urlWA, "_blank");
   
   hideJualPopup();
 }
 
-// Event listeners
-document.querySelectorAll(".saldo-action-btn").forEach((btn, index) => {
-  btn.addEventListener("click", () => {
-    if (index === 1) { // Button Jual (index 1)
-      showJualPopup();
-    }
+// Event listeners - Button Jual pada card reward/liter
+const jualBtn = document.querySelector("#reward-box .saldo-action-btn");
+if (jualBtn) {
+  console.log("Button Jual ditemukan:", jualBtn);
+  jualBtn.addEventListener("click", () => {
+    console.log("Button Jual diklik!");
+    showJualPopup();
   });
-});
+}
 
 document.querySelector(".popup-close").addEventListener("click", hideJualPopup);
 document.querySelector(".popup-overlay").addEventListener("click", (e) => {
