@@ -848,7 +848,7 @@ document.querySelector("#logout-btn").addEventListener("click", () => {
 });
 
 // ============ ORIGINAL CODE ============
-const API_URL = "https://script.google.com/macros/s/AKfycbxXTGHPvkZ97XYMHKj00LZRGt4pMo0QO_H228lZCoyZzHA84llMm2dQFqmxb4FgATwg/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbz0cMHQ3mQ8LL0pe_gderWSjY02WffeDKw15f8iAEdo5bFh9Bvk7-5yGtQK8eaUQg5i/exec";
 
 function formatRupiah(value) {
   return `Rp ${Math.round(value).toLocaleString("id-ID")}`;
@@ -923,52 +923,28 @@ async function loadChart() {
   const rewardBox = document.querySelector("#reward-box");
 
   try {
-    if (priceChart) {
-      priceChart.classList.add("loading");
-    }
-    if (saldoBox) {
-      saldoBox.classList.add("loading");
-    }
-    if (rewardBox) {
-      rewardBox.classList.add("loading");
-    }
+    if (priceChart) priceChart.classList.add("loading");
+    if (saldoBox) saldoBox.classList.add("loading");
+    if (rewardBox) rewardBox.classList.add("loading");
 
-    // Fetch data dari Google Sheets via Apps Script
-    const response = await fetch(API_URL);
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
+    const userData = JSON.parse(localStorage.getItem("user") || "{}");
+    const username = userData.username || "";
 
+    const response = await fetch(`${API_URL}?username=${username}`);
     const data = await response.json();
-    console.log("Data dari sheet:", data);
 
-    // Render chart jika ada data chart
-    if (Array.isArray(data.chart) && data.chart.length > 0) {
-      renderChartData(data.chart);
-    }
+    console.log("Data:", data);
 
-    // Render saldo jika ada
-    if (data.saldo !== undefined) {
-      renderSaldo(data.saldo);
-    }
-
-    // Render reward jika ada
-    if (data.reward !== undefined) {
-      renderReward(data.reward);
-    }
+    if (data.chart) renderChartData(data.chart);
+    if (data.reward !== undefined) renderReward(data.reward);
+    if (data.saldo !== undefined) renderSaldo(data.saldo);
 
   } catch (err) {
-    console.error("Gagal load grafik:", err);
+    console.error(err);
   } finally {
-    if (priceChart) {
-      priceChart.classList.remove("loading");
-    }
-    if (saldoBox) {
-      saldoBox.classList.remove("loading");
-    }
-    if (rewardBox) {
-      rewardBox.classList.remove("loading");
-    }
+    if (priceChart) priceChart.classList.remove("loading");
+    if (saldoBox) saldoBox.classList.remove("loading");
+    if (rewardBox) rewardBox.classList.remove("loading");
   }
 }
 
@@ -1016,7 +992,7 @@ function kirimKeWhatsApp() {
   const userData = JSON.parse(localStorage.getItem("user") || "{}");
   const namaUser = userData.nama || userData.username || "User";
   
-  // Nomor WhatsApp tujuan (ganti dengan nomor yang benar)
+  // Nomor WhatsApp tujuan
   const noWA = "6281392375768";
   
   const pesan = `*PESANAN JUAL MINYAK*
